@@ -19,6 +19,7 @@ sys.path.append("{}/../".format(os.path.dirname(os.path.realpath(__file__))))
 # App
 # ---------------------------------------------------- #
 
+import logging
 from flask import Flask
 from front_end.views import front_end_app
 from api.views import api_app
@@ -31,6 +32,8 @@ app.config.update()
 
 app.register_blueprint(front_end_app)
 app.register_blueprint(api_app)
+
+logging.getLogger('tornado.access').setLevel(logging.INFO)
 
 if __name__ == "__main__":
     http_server = HTTPServer(WSGIContainer(app))
