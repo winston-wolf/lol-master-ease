@@ -149,7 +149,8 @@ class Stats(restful.Resource):
         if not response:
             abort(404, 'No matches found')
 
-        recent_matches = response.get('matches', []).reverse() # reverse since results are backwards
+        recent_matches = response.get('matches', [])
+        recent_matches.reverse() # reverse since results are backwards
         match_ids = [_match['matchId'] for _match in recent_matches if _match['season'] == SEASON_NAME][:3]
         match_id_strs = [str(match_id) for match_id in match_ids]
 
