@@ -1,0 +1,168 @@
+body {
+  background: #fff;
+}
+
+@main-background-color: #4488c4;
+
+.gradient-background {
+  background: #4488c4; /* Old browsers */
+  background: -moz-linear-gradient(top,  #4488c4 0%, #337ab7 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#4488c4), color-stop(100%,#337ab7)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #4488c4 0%,#337ab7 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #4488c4 0%,#337ab7 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #4488c4 0%,#337ab7 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #4488c4 0%,#337ab7 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4488c4', endColorstr='#337ab7',GradientType=0 ); /* IE6-9 */
+}
+
+.my-nav {
+  background-color: #444;
+  margin: 0;
+  color: #fff;
+  border-radius: 0;
+  border-bottom: 2px rgba(255, 255, 255, .1) groove;
+
+  a {
+    color: #fff;
+  }
+}
+
+.my-master-header,
+.my-header {
+  .gradient-background;
+  padding-top: 60px;
+  padding-bottom: 80px;
+  text-align: center;
+
+  h1, p {
+    color: #fff;
+  }
+}
+.my-master-header {
+  padding-top: 100px;
+  padding-bottom: 160px;
+  border-bottom: 2px rgba(255, 255, 255, .1) groove;
+}
+
+.my-footer {
+  text-align: center;
+  font-size: 10px;
+  padding-top: 10px;
+}
+
+.league-icon {
+  width: 35px;
+}
+
+.my-stats {
+  padding-top: 55px;
+  padding-bottom: 40px;
+  text-align: center;
+  background-color: #eee;
+  border-bottom: 2px rgba(255, 255, 255, .1) groove;
+}
+
+.my-logo {
+  margin-bottom: 0;
+}
+
+table.table-stats {
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+
+  tr.header {
+    td.team-blue,
+    td.team-red {
+      position: relative;
+
+      .team-border {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 4px;
+        width: 100%;
+      }
+    }
+
+    td.team-blue .team-border {
+      background-color: #2747e8;
+    }
+
+    td.team-red .team-border {
+      background-color: #cb2124;
+    }
+  }
+
+  tr.row-0 {
+    font-weight: bold;
+    border-bottom: 2px groove #bbb;
+    border-top: 2px groove #bbb;
+  }
+
+  tr.total {
+
+  }
+  td.current-player {
+    background: #dbeeff;
+  }
+  td.team-blue {
+    background-color: #f5fafe;
+
+    &.current-player {
+      background: #dbeeff;
+    }
+  }
+  td.team-red {
+    background-color: #fff3f3;
+
+    &.current-player {
+      background: #f2d7d7;
+    }
+  }
+
+  td.expand-all,
+  td.group {
+    &:hover {
+      background-color: #f9f9f9;
+      cursor: pointer;
+    }
+  }
+  td.group {
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+  }
+
+  td {
+    width: 100px;
+    vertical-align: middle !important;
+    text-align: center;
+  }
+
+  td.game-conclusion-left,
+  td.game-conclusion-right {
+    font-size: 18px;
+  }
+  td.game-conclusion-left {
+    text-align: left;
+  }
+  td.game-conclusion-right {
+    text-align: right;
+  }
+
+  tr.expandable {
+    display: none;
+
+    &.expand {
+      display: table-row;
+    }
+  }
+  td.expandable {
+    display: none;
+
+    &.expand {
+      display: table-cell;
+    }
+  }
+}

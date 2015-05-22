@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <title>Freelo.gg</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="/front_end/css/font-awesome.min.css" />
+
+        <!-- Application -->
+        <link rel="stylesheet" href="/front_end/css/application.css" />
+    </head>
+    <body>
+
+        <script type="text/x-handlebars">
+            <header class="navbar my-nav">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a href="/" class="navbar-brand"><img src="/front_end/images/league-icons/challenger.png" style="line-height: 50px; width: 35px; display: inline-block;" />Freelo.gg</a>
+                    </div>
+                    <nav class="collapse navbar-collapse bs-navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                {{#if header_summoner_search}}
+                                    {{view "summonerSearch" class="navbar-form"}}
+                                {{/if}}
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </header>
+
+            {{outlet}}
+
+            <footer class="my-footer">
+                <div class="container">
+                    &copy; {{current_year}} Freelo.gg
+                    <br />
+                    <br />
+                    Freelo.gg isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.
+                </div>
+            </footer>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="index">
+            <div class="my-master-header">
+                <div class="container">
+                    <img class="my-logo" src="/front_end/images/challenger-league.png" />
+                    <p class="lead">{{generated_slogan}}</p>
+                    {{view "summonerSearch"}}
+                </div>
+            </div>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="stats">
+            <div class="my-stats">
+                <div class="container">
+                    {{#each stats as |stat|}}
+                        <table class="table table-bordered table-striped table-stats">
+                            <tbody>
+                            <tr>
+                                <td colspan="99">Game on <strong>{{humandate stat.create_datetime}}</strong> lasted about <strong>{{stat.match_total_time_in_minutes}} minutes</strong></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td colspan="5" class="game-conclusion-left">{{if stat.current_player_won 'VICTORY' 'DEFEAT'}}</td>
+                                <td colspan="5" class="game-conclusion-right">{{if stat.current_player_won 'DEFEAT' 'VICTORY'}}</td>
+                            </tr>
+                            <tr class="header">
+                                <td class="expand-all-DISABLED"><i class="hide fa fa-plus-square-o"></i></td>
+                                <td class="hide"></td>
+                                {{#each stat.players as |player index|}}
+                                    <td class="{{player_classes stat.current_player_team_red index=index}}">
+
+                                        <img src="{{player.champion.image_icon_url}}" width="30" /><br />
+                                        {{#link-to 'stats' controllers.summonerSearch.region player.summoner_name}}{{player.summoner_name}}{{/link-to}}
+
+                                        <div class="team-border"></div>
+                                    </td>
+                                {{/each}}
+                            </tr>
+                            {{#each stat.key_factors as |key_factor row_index|}}
+                                <tr class="total row-{{row_index}}">
+                                    <td rowspan="1" class="group-DISABLED">{{key_factor.name}}</td>
+                                    <td class="hide">Overall</td>
+                                    {{#each key_factor.totals as |league index|}}
+                                        <td class="{{player_classes stat.current_player_team_red index=index}}">
+                                            <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league}}.png" title="{{ucwords league}}" />
+                                        </td>
+                                    {{/each}}
+                                </tr>
+                                {{#each key_factor.sets as |set|}}
+                                    <tr class="expandable">
+                                        <td>{{set.name}}</td>
+                                        {{#each set.values as |league index|}}
+                                            <td class="{{player_classes stat.current_player_team_red index=index}}">
+                                                <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league}}.png" title="{{ucwords league}}" />
+                                            </td>
+                                        {{/each}}
+                                    </tr>
+                                {{/each}}
+                            {{/each}}
+                            </tbody>
+                        </table>
+                    {{else}}
+                        <h2>Sorry, we couldn't find any games for this summoner.</h2>
+                        <p class="lead">Misspelled summoner name? Wrong region? No games play?</p>
+                    {{/each}}
+                </div>
+            </div>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="loading">
+            <div class="my-stats">
+                <div class="container">
+                    <h2>
+                        <i class="fa fa-spinner fa-spin"></i> Loading...
+                    </h2>
+                </div>
+            </div>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="summoner-search">
+            <div class="input-group">
+                {{input type="text" value=controllers.summonerSearch.summoner_name placeholder="Enter a summoner name" class="form-control" aria-label="Enter summoner name"}}
+                {{view "regionDropdown"}}
+            </div>
+            <button type="submit" class="btn btn-default">Search</button>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="region-dropdown">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">{{controllers.summonerSearch.region}}</button>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                {{#each controllers.summonerSearch.regions as |region|}}
+                    <li>{{#view "regionItem" region=region}}{{region}}{{/view}}</li>
+                {{/each}}
+            </ul>
+        </script>
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <!-- Ember -->
+        <script src="/front_end/js/libs/handlebars-v3.0.3.js"></script>
+        <script src="http://builds.emberjs.com/beta/ember.debug.js"></script>
+        <script src="http://builds.emberjs.com/beta/ember-data.js"></script>
+        <script src="http://builds.emberjs.com/beta/ember-template-compiler.js"></script>
+        <!-- App -->
+        <script src="/front_end/js/ember/app.js"></script>
+        <script src="/front_end/js/ember/router.js"></script>
+        <script src="/front_end/js/ember/controllers/index.js"></script>
+        <script src="/front_end/js/ember/controllers/stats.js"></script>
+    </body>
+</html>
