@@ -4,6 +4,7 @@ App.Stat = DS.Model.extend({
     current_player_won: DS.attr(),
     match_total_time_in_minutes: DS.attr(),
     create_datetime: DS.attr(),
+    match_history_url: DS.attr(),
     players: DS.attr(),
     key_factors: DS.attr()
 });

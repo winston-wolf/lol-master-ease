@@ -217,7 +217,7 @@ class Stats(restful.Resource):
                 FROM
                     (
                         SELECT
-                            q1.summoner_champion_id,
+                                q1.summoner_champion_id,
                                 q1.match_region,
                                 q1.role,
                                 q1.summoner_id,
@@ -226,6 +226,9 @@ class Stats(restful.Resource):
                                 q1.match_create_datetime,
                                 q1.match_total_time_in_minutes,
                                 q1.summoner_is_winner,
+                                q1.summoner_assists,
+                                q1.summoner_deaths,
+                                q1.summoner_kills,
 
                                 CEIL((q1.cs - afd.average_cs) / afd.freelo_dev_cs) AS tier_diff_cs,
                                 CEIL((q1.vision_wards_placed - afd.average_vision_wards_placed) / afd.freelo_dev_vision_wards_placed) AS tier_diff_vision_wards_placed,
@@ -265,6 +268,9 @@ class Stats(restful.Resource):
                                     match_create_datetime,
                                     (summoner_minions_killed + summoner_neutral_minions_killed_team_jungle + summoner_neutral_minions_killed_enemy_jungle) / match_total_time_in_minutes * 32 AS cs,
                                     summoner_vision_wards_placed / match_total_time_in_minutes * 32 AS vision_wards_placed,
+                                    summoner_assists,
+                                    summoner_deaths,
+                                    summoner_kills_total as summoner_kills,
                                     summoner_assists / match_total_time_in_minutes * 32 AS assists,
                                     summoner_deaths / match_total_time_in_minutes * 32 AS deaths,
                                     summoner_kills_total / match_total_time_in_minutes * 32 AS kills,
@@ -316,6 +322,7 @@ class Stats(restful.Resource):
                 'match_total_time_in_minutes': player_game_data[0]['match_total_time_in_minutes'],
                 'current_player_team_red': player_game_data[0]['summoner_team_id'] == 100,
                 'current_player_won': player_game_data[0]['summoner_is_winner'] == 1,
+                'match_history_url': 'http://matchhistory.{}.leagueoflegends.com/en/#match-details/{}/{}/{}'.format(region, region, match_id, summoner_id),
                 'players': [],
                 'key_factors': [
                     {
@@ -413,6 +420,9 @@ class Stats(restful.Resource):
                     'summoner_name': player_game['summoner_name'],
                     'summoner_rank_tier': player_game['summoner_rank_tier'],
                     'team_id': player_game['summoner_team_id'],
+                    'summoner_kills': player_game['summoner_kills'],
+                    'summoner_deaths': player_game['summoner_deaths'],
+                    'summoner_assists': player_game['summoner_assists'],
                 })
 
                 rank_id = player_game['summoner_rank_tier_id'] or average_rank
