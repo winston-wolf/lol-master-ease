@@ -79,7 +79,11 @@
                         <table class="table table-bordered table-striped table-stats">
                             <tbody>
                             <tr>
-                                <td colspan="99">Game on <strong>{{humandate stat.create_datetime}}</strong> lasted about <strong>{{stat.match_total_time_in_minutes}} minutes</strong> <a href="{{stat.match_history_url}}" target="_blank">Match History</a></a></td>
+                                <td colspan="99" style="position: relative;">
+                                    Game on <strong>{{humandate stat.create_datetime}}</strong> lasted about <strong>{{stat.match_total_time_in_minutes}} minutes</strong>
+                                    <a style="position: absolute; right: 5px;" href="{{stat.match_history_url}}" target="_blank">Match History</a>
+                                    &nbsp;
+                                </td>
                             </tr>
                             <tr>
                                 <td></td>
