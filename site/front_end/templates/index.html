@@ -70,6 +70,7 @@
 
         <script type="text/x-handlebars" data-template-name="stats">
             <div class="my-stats">
+                <h2>Latest Ranked Solo Queue Games</h2>
                 <div class="container">
                     {{#each stats as |stat|}}
                         <table class="table table-bordered table-striped table-stats">
@@ -119,7 +120,7 @@
                             </tbody>
                         </table>
                     {{else}}
-                        <h2>Sorry, we couldn't find any games for this summoner.</h2>
+                        <h2>Sorry, we couldn't find any recent ranked solo queue games for this summoner.</h2>
                         <p class="lead">Misspelled summoner name? Wrong region? No games play?</p>
                     {{/each}}
                 </div>

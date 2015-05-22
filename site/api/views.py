@@ -213,7 +213,7 @@ class Stats(restful.Resource):
                     champions.name as champion_name,
                     champions.id as champion_id,
                     champions.image_icon_url as champion_icon_url,
-                    SUM(tier_diff_cs + tier_diff_vision_wards_placed + tier_diff_assists + tier_diff_deaths + tier_diff_kills + tier_diff_sight_wards_placed + tier_diff_team_first_dragon_kill_time_in_minutes + tier_diff_match_time_in_minutes + tier_diff_damage_done_to_champions) AS overall
+                    ROUND((tier_diff_cs + tier_diff_vision_wards_placed + tier_diff_assists + tier_diff_deaths + tier_diff_kills + tier_diff_sight_wards_placed + tier_diff_team_first_dragon_kill_time_in_minutes + tier_diff_match_time_in_minutes + tier_diff_damage_done_to_champions)/9) AS overall
                 FROM
                     (
                         SELECT
@@ -233,7 +233,7 @@ class Stats(restful.Resource):
                                 CEIL((q1.deaths - afd.average_deaths) / afd.freelo_dev_deaths) AS tier_diff_deaths,
                                 CEIL((q1.kills - afd.average_kills) / afd.freelo_dev_kills) AS tier_diff_kills,
                                 CEIL((q1.sight_wards_placed - afd.average_sight_wards_placed) / afd.freelo_dev_sight_wards_placed) AS tier_diff_sight_wards_placed,
-                                IFNULL(CEIL((q1.team_first_dragon_kill_time_in_minutes - afd.average_cs_first_dragon_time_in_minutes) / afd.freelo_dev_first_dragon_time_in_minutes), - 3) AS tier_diff_team_first_dragon_kill_time_in_minutes,
+                                GREATEST(IFNULL(CEIL((q1.team_first_dragon_kill_time_in_minutes - afd.average_cs_first_dragon_time_in_minutes) / afd.freelo_dev_first_dragon_time_in_minutes), -3), -3) AS tier_diff_team_first_dragon_kill_time_in_minutes,
                                 CEIL((q1.match_total_time_in_minutes - afd.average_match_time_in_minutes) / afd.freelo_dev_match_time_in_minutes) AS tier_diff_match_time_in_minutes,
                                 CEIL((q1.damage_done_to_champions - afd.average_damage_done_to_champions) / afd.freelo_dev_damage_done_to_champions) AS tier_diff_damage_done_to_champions
                         FROM
