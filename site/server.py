@@ -34,7 +34,5 @@ app.register_blueprint(api_app)
 
 if __name__ == "__main__":
     http_server = HTTPServer(WSGIContainer(app))
-    http_server.bind(port=80, address='0.0.0.0')
-    http_server.start(num_processes=8)
-
+    http_server.listen(80)
     IOLoop.instance().start()
