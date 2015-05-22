@@ -150,7 +150,7 @@ class Stats(restful.Resource):
             abort(404, 'No matches found')
 
         recent_matches = response.get('matches', [])
-        match_ids = [_match['matchId'] for _match in recent_matches if _match['season'] == SEASON_NAME][0:3]
+        match_ids = [_match['matchId'] for _match in recent_matches if _match['season'] == SEASON_NAME][-3:]
         match_id_strs = [str(match_id) for match_id in match_ids]
 
         # if we found no matches this season, BAIL
