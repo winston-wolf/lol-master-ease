@@ -75,19 +75,19 @@
             <div class="my-stats">
                 <h2>Latest Ranked Solo Queue Games</h2>
                 <div style="margin-bottom: 35px;">
-                    <img src="/front_end/images/league-icons/bronze.png" />
+                    <img src="/front_end/images/league-icons/bronze.png" title="Bronze" />
                     ⇨
-                    <img src="/front_end/images/league-icons/silver.png" />
+                    <img src="/front_end/images/league-icons/silver.png" title="Silver" />
                     ⇨
-                    <img src="/front_end/images/league-icons/gold.png" />
+                    <img src="/front_end/images/league-icons/gold.png" title="Gold" />
                     ⇨
-                    <img src="/front_end/images/league-icons/platinum.png" />
+                    <img src="/front_end/images/league-icons/platinum.png" title="Platinum" />
                     ⇨
-                    <img src="/front_end/images/league-icons/diamond.png" />
+                    <img src="/front_end/images/league-icons/diamond.png" title="Diamond" />
                     ⇨
-                    <img src="/front_end/images/league-icons/master.png" />
+                    <img src="/front_end/images/league-icons/master.png" title="Master" />
                     ⇨
-                    <img src="/front_end/images/league-icons/challenger.png" />
+                    <img src="/front_end/images/league-icons/challenger.png" title="Challenger" />
                 </div>
                 <div class="container">
                     {{#each stats as |stat|}}
@@ -139,7 +139,7 @@
         </script>
 
         <script type="text/x-handlebars" data-template-name="components/league-decorator">
-            <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league.name}}.png" />
+            <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league.name}}.png" title="{{ucwords league.name}}" />
 
             <div class="league-offset">
                 <i class="fa fa-{{offset_icon_class}} league-offset-icon"></i>
