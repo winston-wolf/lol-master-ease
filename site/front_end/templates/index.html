@@ -112,8 +112,9 @@
                                     <td class="{{player_classes stat.current_player_team_red index=index}}">
 
                                         <img src="{{player.champion.image_icon_url}}" width="30" /><br />
-                                        {{#link-to 'stats' controllers.summonerSearch.region player.summoner_name}}{{player.summoner_name}}{{/link-to}}<br />
-                                        {{player.summoner_kills}} / {{player.summoner_deaths}} / {{player.summoner_assists}}
+                                        {{#link-to 'stats' controllers.summonerSearch.region player.summoner_name class="player-link" title=player.summoner_name}}{{player.summoner_name}}{{/link-to}}<br />
+                                        <div class="stat-score"><span class="icon"></span><span class="value">{{player.summoner_kills}}/{{player.summoner_deaths}}/{{player.summoner_assists}}</span></div>
+                                        <div class="stat-minions"><span class="icon"></span><span class="value">{{player.summoner_minions_killed}}</span></div>
 
                                         <div class="team-border"></div>
                                     </td>

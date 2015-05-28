@@ -160,3 +160,43 @@ table.table-stats td.expandable {
 table.table-stats td.expandable.expand {
   display: table-cell;
 }
+.player-link {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 85px;
+  display: inline-block;
+  overflow: hidden;
+}
+.stat-score,
+.stat-minions {
+  white-space: nowrap;
+}
+.stat-score .icon,
+.stat-minions .icon {
+  display: inline-block;
+  margin-right: 2px;
+  vertical-align: middle;
+}
+.stat-score .value,
+.stat-minions .value {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 15px;
+}
+.stat-score .icon {
+  background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/score.png');
+  background-repeat: no-repeat;
+  background-size: 24px 24px;
+  width: 14px;
+  height: 14px;
+}
+.stat-score .value {
+  letter-spacing: 1px;
+}
+.stat-minions .icon {
+  background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/minion.png');
+  background-repeat: no-repeat;
+  background-size: 24px 24px;
+  width: 15px;
+  height: 17px;
+}

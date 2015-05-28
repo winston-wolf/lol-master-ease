@@ -73,6 +73,10 @@ table.table-stats {
   background: #fff;
 
   tr.header {
+//    td {
+//      white-space: nowrap;
+//    }
+
     td.team-blue,
     td.team-red {
       position: relative;
@@ -164,5 +168,52 @@ table.table-stats {
     &.expand {
       display: table-cell;
     }
+  }
+}
+
+.player-link {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 85px;
+  display: inline-block;
+  overflow: hidden;
+}
+
+// Stats
+.stat-score,
+.stat-minions {
+  white-space: nowrap;
+  
+  .icon {
+    display: inline-block;
+    margin-right: 2px;
+    vertical-align: middle;
+  }
+  .value {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 15px;
+  }
+}
+
+.stat-score {
+  .icon {
+    background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/score.png');
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    width: 14px;
+    height: 14px;
+  }
+  .value {
+    letter-spacing: 1px;
+  }
+}
+.stat-minions {
+  .icon {
+    background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/minion.png');
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    width: 15px;
+    height: 17px;
   }
 }
