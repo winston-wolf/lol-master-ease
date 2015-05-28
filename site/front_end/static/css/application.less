@@ -50,10 +50,6 @@ body {
   padding-top: 10px;
 }
 
-.league-icon {
-  width: 35px;
-}
-
 .my-stats {
   padding-top: 35px;
   padding-bottom: 40px;
@@ -172,6 +168,8 @@ table.table-stats {
 }
 
 .player-link {
+  line-height: 1em;
+  font-size: 12px;
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 85px;
@@ -179,11 +177,104 @@ table.table-stats {
   overflow: hidden;
 }
 
+.league-decorator {
+  position: relative;
+
+  .league-icon {
+    height: 30px;
+  }
+
+  .played-up,
+  .played-down {
+    position: absolute;
+  }
+  .played-up {
+    color: #3c763d;
+    top: -8px;
+    left: 50%;
+    margin-left: -2px;
+  }
+  .played-down {
+    color: #a94442;
+    bottom: -8px;
+    left: 50%;
+    margin-left: -2px;
+  }
+  .played-normal {
+    display: none;
+  }
+
+  .league-offset {
+    display: none;
+    position: absolute;
+    right: 50%;
+    top: 0;
+    margin-right: -32px;
+    font-weight: bold;
+
+    .league-offset-value,
+    .league-offset-icon {
+      float: left;
+      line-height: 30px;
+    }
+
+    .league-offset-value {
+      margin-left: 2px;
+    }
+  }
+  &:hover {
+    .league-offset {
+      display: block;
+    }
+  }
+}
+
+.summoner-info {
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  width: 64px;
+
+  .summoner-champion-icon {
+    height: 42px;
+    float: left;
+  }
+
+  .summoner-champion-level {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    font-size: 12px;
+    line-height: 12px;
+  }
+
+  .summoner-spell-book {
+    float: left;
+    width: 20px;
+    height: 42px;
+    margin-left: 2px;
+
+    .summoner-spell-icon {
+      display: block;
+      margin-top: 2px;
+      height: 20px;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+  }
+}
+
 // Stats
 .stat-score,
 .stat-minions {
   white-space: nowrap;
-  
+  line-height: 1em;
+
   .icon {
     display: inline-block;
     margin-right: 2px;
@@ -192,7 +283,7 @@ table.table-stats {
   .value {
     display: inline-block;
     vertical-align: middle;
-    font-size: 15px;
+    font-size: 12px;
   }
 }
 
@@ -217,3 +308,7 @@ table.table-stats {
     height: 17px;
   }
 }
+.popover-nowrap {
+  white-space: nowrap;
+}
+

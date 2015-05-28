@@ -241,6 +241,10 @@ class Stats(restful.Resource):
                                 q1.summoner_assists,
                                 q1.summoner_deaths,
                                 q1.summoner_kills,
+                                q1.summoner_champion_level,
+
+                                sum_icon1.image_icon_url as summoner_spell_1_icon_url,
+                                sum_icon2.image_icon_url as summoner_spell_2_icon_url,
 
                                 CEIL((q1.cs - afd.average_cs) / afd.freelo_dev_cs) AS tier_diff_cs,
                                 CEIL((q1.vision_wards_placed - afd.average_vision_wards_placed) / afd.freelo_dev_vision_wards_placed) AS tier_diff_vision_wards_placed,
@@ -282,9 +286,12 @@ class Stats(restful.Resource):
                                     summoner_vision_wards_placed / match_total_time_in_minutes * 32 AS vision_wards_placed,
                                     summoner_minions_killed,
                                     (summoner_neutral_minions_killed_team_jungle + summoner_neutral_minions_killed_enemy_jungle) as summoner_neutral_minions_killed,
+                                    summoner_spell_1_id,
+                                    summoner_spell_2_id,
                                     summoner_assists,
                                     summoner_deaths,
                                     summoner_kills_total as summoner_kills,
+                                    summoner_champion_level,
                                     summoner_assists / match_total_time_in_minutes * 32 AS assists,
                                     summoner_deaths / match_total_time_in_minutes * 32 AS deaths,
                                     summoner_kills_total / match_total_time_in_minutes * 32 AS kills,
@@ -301,6 +308,8 @@ class Stats(restful.Resource):
                             ) q1
                         INNER JOIN aggregate_freelo_deviations afd ON afd.champion_role = q1.role
                             AND afd.champion_id = q1.summoner_champion_id
+                        INNER JOIN summoner_spells sum_icon1 ON sum_icon1.id = q1.summoner_spell_1_id
+                        INNER JOIN summoner_spells sum_icon2 ON sum_icon2.id = q1.summoner_spell_2_id
                         GROUP BY
                             summoner_id
                     ) q2
@@ -343,61 +352,51 @@ class Stats(restful.Resource):
                         'id': 'overall',
                         'name': 'Overall',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'cs',
                         'name': 'CS',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'wards_vision',
                         'name': 'Vision Wards',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'assists',
                         'name': 'Assists',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'deaths',
                         'name': 'Deaths',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'kills',
                         'name': 'Kills',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'wards_sight',
                         'name': 'Sight Wards',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'first_dragon',
                         'name': 'First Dragon',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'match_time',
                         'name': 'Game Length',
                         'totals': [],
-                        'sets': [],
                     },
                     {
                         'id': 'damage_done_to_champions',
                         'name': 'Damage to Champions',
                         'totals': [],
-                        'sets': [],
                     },
                 ]
             }
@@ -434,6 +433,7 @@ class Stats(restful.Resource):
                     'summoner_name': player_game['summoner_name'],
                     'summoner_rank_tier': player_game['summoner_rank_tier'],
                     'team_id': player_game['summoner_team_id'],
+                    'summoner_champion_level': player_game['summoner_champion_level'],
                     'summoner_kills': player_game['summoner_kills'],
                     'summoner_deaths': player_game['summoner_deaths'],
                     'summoner_assists': player_game['summoner_assists'],
@@ -441,6 +441,8 @@ class Stats(restful.Resource):
                     'region': region.upper(),
                     'summoner_neutral_minions_killed': player_game['summoner_neutral_minions_killed'],
                     'summoner_cs': player_game['summoner_minions_killed'] + player_game['summoner_neutral_minions_killed'],
+                    'summoner_spell_1_icon_url': player_game['summoner_spell_1_icon_url'],
+                    'summoner_spell_2_icon_url': player_game['summoner_spell_2_icon_url'],
                 })
 
                 rank_id = player_game['summoner_rank_tier_id'] or average_rank
@@ -448,11 +450,15 @@ class Stats(restful.Resource):
                     diffed_rank = rank_id + int(offset)
 
                     if diffed_rank > RANK_MAX:
-                        return 'GOD'
+                        rank_name = 'GOD'
+                        diffed_rank = RANK_MAX
                     elif diffed_rank < 1:
-                        return 'WOOD'
+                        rank_name = 'WOOD'
+                        diffed_rank = 0
                     else:
-                        return RANK_ID_TO_NAME[diffed_rank]
+                        rank_name = RANK_ID_TO_NAME[diffed_rank]
+
+                    return {'id': diffed_rank, 'name': rank_name, 'offset': int(offset)}
 
                 stats_key_factors['overall']['totals'].append(get_diffed_rank(player_game['overall']))
                 stats_key_factors['cs']['totals'].append(get_diffed_rank(player_game['tier_diff_cs']))

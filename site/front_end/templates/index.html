@@ -123,20 +123,10 @@
                                     <td class="hide">Overall</td>
                                     {{#each key_factor.totals as |league index|}}
                                         <td class="{{player_classes stat.current_player_team_red index=index}}">
-                                            <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league}}.png" title="{{ucwords league}}" />
+                                            {{league-decorator league=league}}
                                         </td>
                                     {{/each}}
                                 </tr>
-                                {{#each key_factor.sets as |set|}}
-                                    <tr class="expandable">
-                                        <td>{{set.name}}</td>
-                                        {{#each set.values as |league index|}}
-                                            <td class="{{player_classes stat.current_player_team_red index=index}}">
-                                                <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league}}.png" title="{{ucwords league}}" />
-                                            </td>
-                                        {{/each}}
-                                    </tr>
-                                {{/each}}
                             {{/each}}
                             </tbody>
                         </table>
@@ -148,11 +138,27 @@
             </div>
         </script>
 
+        <script type="text/x-handlebars" data-template-name="components/league-decorator">
+            <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league.name}}.png" />
+
+            <div class="league-offset">
+                <i class="fa fa-{{offset_icon_class}} league-offset-icon"></i>
+                <span class="league-offset-value">{{offset}}</span>
+            </div>
+        </script>
+
         <script type="text/x-handlebars" data-template-name="components/player-info">
-            <img src="{{player.champion.image_icon_url}}" width="30" /><br />
-            {{#link-to 'stats' player.region player.summoner_name class="player-link" title=player.summoner_name}}{{player.summoner_name}}{{/link-to}}<br />
+            <div class="summoner-info">
+                <img class="summoner-champion-icon" src="{{player.champion.image_icon_url}}" />
+                <div class="summoner-spell-book">
+                    <img class="summoner-spell-icon" src="{{player.summoner_spell_1_icon_url}}" />
+                    <img class="summoner-spell-icon" src="{{player.summoner_spell_2_icon_url}}" />
+                </div>
+                <div class="summoner-champion-level">{{player.summoner_champion_level}}</div>
+            </div>
+            <div>{{#link-to 'stats' player.region player.summoner_name class="player-link" title=player.summoner_name}}{{player.summoner_name}}{{/link-to}}</div>
             <div class="stat-score"><span class="icon"></span><span class="value">{{player.summoner_kills}}/{{player.summoner_deaths}}/{{player.summoner_assists}}</span></div>
-            <div class="stat-minions"><span class="icon"></span><span class="value" data-toggle="tooltip" data-placement="top" title="Minions: {{player.summoner_minions_killed}}<br />Jungle: {{player.summoner_neutral_minions_killed}}">{{player.summoner_cs}}</span></div>
+            <div class="stat-minions"><span class="icon"></span><span class="value">{{player.summoner_cs}}</span></div>
         </script>
 
         <script type="text/x-handlebars" data-template-name="loading">

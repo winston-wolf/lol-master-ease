@@ -26,11 +26,41 @@ App.ApplicationAdapter = DS.RESTAdapter.extend({
 
 // player info
 App.PlayerInfoComponent = Ember.Component.extend({
-    tooltipActivate: function() {
-        this.$('[data-toggle="tooltip"]').tooltip({
-            html: true
+    activatePopovers: function() {
+        this.$('.stat-minions').popover({
+            trigger: 'hover',
+            placement: 'top',
+            html: true,
+            content: '' +
+                '<div class="popover-nowrap">' +
+                    'Minions: '+this.get('player.summoner_minions_killed')+'<br />' +
+                    'Jungle: '+this.get('player.summoner_neutral_minions_killed') +
+                '</div>'
         });
     }.on('didInsertElement')
+});
+
+// league decorator
+App.LeagueDecoratorComponent = Ember.Component.extend({
+    classNames: ['league-decorator'],
+    setOffsetValues: function() {
+        var league = this.get('league'),
+            offset = league.offset,
+            offset_icon_class = 'sort';
+
+        if(offset > 0) {
+            offset_icon_class = 'sort-asc played-up';
+        }
+        else if(offset < 0) {
+            offset_icon_class = 'sort-desc played-down';
+        }
+        else {
+            offset_icon_class = 'sort played-normal';
+        }
+
+        this.set('offset_icon_class', offset_icon_class);
+        this.set('offset', Math.abs(offset));
+    }.on('willInsertElement')
 });
 
 // summoner search

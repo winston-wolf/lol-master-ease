@@ -67,9 +67,6 @@ body {
   font-size: 10px;
   padding-top: 10px;
 }
-.league-icon {
-  width: 35px;
-}
 .my-stats {
   padding-top: 35px;
   padding-bottom: 40px;
@@ -161,15 +158,96 @@ table.table-stats td.expandable.expand {
   display: table-cell;
 }
 .player-link {
+  line-height: 1em;
+  font-size: 12px;
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 85px;
   display: inline-block;
   overflow: hidden;
 }
+.league-decorator {
+  position: relative;
+}
+.league-decorator .league-icon {
+  height: 30px;
+}
+.league-decorator .played-up,
+.league-decorator .played-down {
+  position: absolute;
+}
+.league-decorator .played-up {
+  color: #3c763d;
+  top: -8px;
+  left: 50%;
+  margin-left: -2px;
+}
+.league-decorator .played-down {
+  color: #a94442;
+  bottom: -8px;
+  left: 50%;
+  margin-left: -2px;
+}
+.league-decorator .played-normal {
+  display: none;
+}
+.league-decorator .league-offset {
+  display: none;
+  position: absolute;
+  right: 50%;
+  top: 0;
+  margin-right: -32px;
+  font-weight: bold;
+}
+.league-decorator .league-offset .league-offset-value,
+.league-decorator .league-offset .league-offset-icon {
+  float: left;
+  line-height: 30px;
+}
+.league-decorator .league-offset .league-offset-value {
+  margin-left: 2px;
+}
+.league-decorator:hover .league-offset {
+  display: block;
+}
+.summoner-info {
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  width: 64px;
+}
+.summoner-info .summoner-champion-icon {
+  height: 42px;
+  float: left;
+}
+.summoner-info .summoner-champion-level {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+  font-size: 12px;
+  line-height: 12px;
+}
+.summoner-info .summoner-spell-book {
+  float: left;
+  width: 20px;
+  height: 42px;
+  margin-left: 2px;
+}
+.summoner-info .summoner-spell-book .summoner-spell-icon {
+  display: block;
+  margin-top: 2px;
+  height: 20px;
+}
+.summoner-info .summoner-spell-book .summoner-spell-icon:first-child {
+  margin-top: 0;
+}
 .stat-score,
 .stat-minions {
   white-space: nowrap;
+  line-height: 1em;
 }
 .stat-score .icon,
 .stat-minions .icon {
@@ -181,7 +259,7 @@ table.table-stats td.expandable.expand {
 .stat-minions .value {
   display: inline-block;
   vertical-align: middle;
-  font-size: 15px;
+  font-size: 12px;
 }
 .stat-score .icon {
   background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/score.png');
@@ -199,4 +277,7 @@ table.table-stats td.expandable.expand {
   background-size: 24px 24px;
   width: 15px;
   height: 17px;
+}
+.popover-nowrap {
+  white-space: nowrap;
 }
