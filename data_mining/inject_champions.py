@@ -42,13 +42,15 @@ def run():
     database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
     insert_values = []
 
-    champions_dict = request(API_URL_CHAMPIONS, 'global')['data']
+    response = request(API_URL_CHAMPIONS, 'global')
+    champions_dict = response['data']
+    version = response['version']
 
     for champion in champions_dict.values():
         insert_values.append(u"({}, {}, {}, {}, {})".format(
             champion['id'],
             database.escape(champion['name']),
-            database.escape('http://ddragon.leagueoflegends.com/cdn/5.2.1/img/champion/' + champion['image']['full']),
+            database.escape('http://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}'.format(version, champion['image']['full'])),
             database.escape('http://ddragon.leagueoflegends.com/cdn/img/champion/loading/' + champion['image']['full'].replace('.png', '_0.jpg')),
             database.escape('http://ddragon.leagueoflegends.com/cdn/img/champion/splash/' + champion['image']['full'].replace('.png', '_0.jpg')),
         ))
