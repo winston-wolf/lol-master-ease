@@ -151,7 +151,16 @@ class Stats(restful.Resource):
 
         recent_matches = response.get('matches', [])
         recent_matches.reverse() # reverse since results are backwards
-        match_ids = [_match['matchId'] for _match in recent_matches if _match['season'] == SEASON_NAME][:3]
+        match_history_index = {}
+        match_ids = []
+        for _match in recent_matches:
+            if _match['season'] == SEASON_NAME:
+                match_ids.append(_match['matchId'])
+                match_history_index[_match['matchId']] = {
+                    'region': _match['region'],
+                    'platformId': _match['platformId'],
+                }
+        match_ids = match_ids[:3]
         match_id_strs = [str(match_id) for match_id in match_ids]
 
         # if we found no matches this season, BAIL
@@ -227,6 +236,7 @@ class Stats(restful.Resource):
                                 q1.match_create_datetime,
                                 q1.match_total_time_in_minutes,
                                 q1.summoner_is_winner,
+                                q1.summoner_minions_killed,
                                 q1.summoner_assists,
                                 q1.summoner_deaths,
                                 q1.summoner_kills,
@@ -269,6 +279,7 @@ class Stats(restful.Resource):
                                     match_create_datetime,
                                     (summoner_minions_killed + summoner_neutral_minions_killed_team_jungle + summoner_neutral_minions_killed_enemy_jungle) / match_total_time_in_minutes * 32 AS cs,
                                     summoner_vision_wards_placed / match_total_time_in_minutes * 32 AS vision_wards_placed,
+                                    summoner_minions_killed,
                                     summoner_assists,
                                     summoner_deaths,
                                     summoner_kills_total as summoner_kills,
@@ -323,7 +334,7 @@ class Stats(restful.Resource):
                 'match_total_time_in_minutes': player_game_data[0]['match_total_time_in_minutes'],
                 'current_player_team_red': player_game_data[0]['summoner_team_id'] == 200,
                 'current_player_won': player_game_data[0]['summoner_is_winner'] == 1,
-                'match_history_url': 'http://matchhistory.{}.leagueoflegends.com/en/#match-details/{}/{}/{}'.format(region, '{}1'.format(region.upper()), match_id, summoner_id),
+                'match_history_url': 'http://matchhistory.{}.leagueoflegends.com/en/#match-details/{}/{}/{}'.format(match_history_index[match_id]['region'], match_history_index[match_id]['platformId'], match_id, summoner_id),
                 'players': [],
                 'key_factors': [
                     {
@@ -424,6 +435,7 @@ class Stats(restful.Resource):
                     'summoner_kills': player_game['summoner_kills'],
                     'summoner_deaths': player_game['summoner_deaths'],
                     'summoner_assists': player_game['summoner_assists'],
+                    'summoner_minions_killed': player_game['summoner_minions_killed'],
                 })
 
                 rank_id = player_game['summoner_rank_tier_id'] or average_rank
