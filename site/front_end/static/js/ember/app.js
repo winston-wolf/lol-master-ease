@@ -24,6 +24,15 @@ App.ApplicationAdapter = DS.RESTAdapter.extend({
     namespace: 'api/1.0'
 });
 
+// player info
+App.PlayerInfoComponent = Ember.Component.extend({
+    tooltipActivate: function() {
+        this.$('[data-toggle="tooltip"]').tooltip({
+            html: true
+        });
+    }.on('didInsertElement')
+});
+
 // summoner search
 App.SummonerSearchController = Ember.Controller.extend({
     regions: REGIONS,
@@ -83,8 +92,12 @@ Ember.Handlebars.registerBoundHelper('player_classes', function(current_player_t
     return classes.join(' ');
 });
 
-Ember.Handlebars.registerHelper('lowercase', function(str) {
+Ember.Handlebars.registerBoundHelper('lowercase', function(str) {
     return str.toString().toLowerCase();
+});
+
+Ember.Handlebars.registerBoundHelper('uppercase', function(str) {
+    return str.toString().toUpperCase();
 });
 
 Ember.Handlebars.registerHelper('ucwords', function(str) {
@@ -95,7 +108,6 @@ Ember.Handlebars.registerHelper('ucwords', function(str) {
 });
 
 Ember.Handlebars.registerBoundHelper('humandate', function(date_str) {
-    console.log('dstr', date_str);
     var date = new Date(date_str);
     return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
 });

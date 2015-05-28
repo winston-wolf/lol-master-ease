@@ -111,10 +111,7 @@
                                 {{#each stat.players as |player index|}}
                                     <td class="{{player_classes stat.current_player_team_red index=index}}">
 
-                                        <img src="{{player.champion.image_icon_url}}" width="30" /><br />
-                                        {{#link-to 'stats' controllers.summonerSearch.region player.summoner_name class="player-link" title=player.summoner_name}}{{player.summoner_name}}{{/link-to}}<br />
-                                        <div class="stat-score"><span class="icon"></span><span class="value">{{player.summoner_kills}}/{{player.summoner_deaths}}/{{player.summoner_assists}}</span></div>
-                                        <div class="stat-minions"><span class="icon"></span><span class="value">{{player.summoner_minions_killed}}</span></div>
+                                        {{player-info player=player}}
 
                                         <div class="team-border"></div>
                                     </td>
@@ -151,6 +148,13 @@
             </div>
         </script>
 
+        <script type="text/x-handlebars" data-template-name="components/player-info">
+            <img src="{{player.champion.image_icon_url}}" width="30" /><br />
+            {{#link-to 'stats' player.region player.summoner_name class="player-link" title=player.summoner_name}}{{player.summoner_name}}{{/link-to}}<br />
+            <div class="stat-score"><span class="icon"></span><span class="value">{{player.summoner_kills}}/{{player.summoner_deaths}}/{{player.summoner_assists}}</span></div>
+            <div class="stat-minions"><span class="icon"></span><span class="value" data-toggle="tooltip" data-placement="top" title="Minions: {{player.summoner_minions_killed}}<br />Jungle: {{player.summoner_neutral_minions_killed}}">{{player.summoner_cs}}</span></div>
+        </script>
+
         <script type="text/x-handlebars" data-template-name="loading">
             <div class="my-stats">
                 <div class="container">
@@ -170,7 +174,7 @@
         </script>
 
         <script type="text/x-handlebars" data-template-name="region-dropdown">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">{{controllers.summonerSearch.region}}</button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">{{uppercase controllers.summonerSearch.region}}</button>
             <ul class="dropdown-menu dropdown-menu-right" role="menu">
                 {{#each controllers.summonerSearch.regions as |region|}}
                     <li>{{#view "regionItem" region=region}}{{region}}{{/view}}</li>

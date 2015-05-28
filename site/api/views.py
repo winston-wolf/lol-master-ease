@@ -237,6 +237,7 @@ class Stats(restful.Resource):
                                 q1.match_total_time_in_minutes,
                                 q1.summoner_is_winner,
                                 q1.summoner_minions_killed,
+                                q1.summoner_neutral_minions_killed,
                                 q1.summoner_assists,
                                 q1.summoner_deaths,
                                 q1.summoner_kills,
@@ -280,6 +281,7 @@ class Stats(restful.Resource):
                                     (summoner_minions_killed + summoner_neutral_minions_killed_team_jungle + summoner_neutral_minions_killed_enemy_jungle) / match_total_time_in_minutes * 32 AS cs,
                                     summoner_vision_wards_placed / match_total_time_in_minutes * 32 AS vision_wards_placed,
                                     summoner_minions_killed,
+                                    (summoner_neutral_minions_killed_team_jungle + summoner_neutral_minions_killed_enemy_jungle) as summoner_neutral_minions_killed,
                                     summoner_assists,
                                     summoner_deaths,
                                     summoner_kills_total as summoner_kills,
@@ -436,6 +438,9 @@ class Stats(restful.Resource):
                     'summoner_deaths': player_game['summoner_deaths'],
                     'summoner_assists': player_game['summoner_assists'],
                     'summoner_minions_killed': player_game['summoner_minions_killed'],
+                    'region': region.upper(),
+                    'summoner_neutral_minions_killed': player_game['summoner_neutral_minions_killed'],
+                    'summoner_cs': player_game['summoner_minions_killed'] + player_game['summoner_neutral_minions_killed'],
                 })
 
                 rank_id = player_game['summoner_rank_tier_id'] or average_rank
