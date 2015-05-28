@@ -321,7 +321,7 @@ class Stats(restful.Resource):
                 'game_id': match_id,
                 'create_datetime': player_game_data[0]['match_create_datetime'].isoformat(),
                 'match_total_time_in_minutes': player_game_data[0]['match_total_time_in_minutes'],
-                'current_player_team_red': player_game_data[0]['summoner_team_id'] == 100,
+                'current_player_team_red': player_game_data[0]['summoner_team_id'] == 200,
                 'current_player_won': player_game_data[0]['summoner_is_winner'] == 1,
                 'match_history_url': 'http://matchhistory.{}.leagueoflegends.com/en/#match-details/{}/{}/{}'.format(region, '{}1'.format(region.upper()), match_id, summoner_id),
                 'players': [],
