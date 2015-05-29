@@ -101,9 +101,6 @@ table.table-stats {
     border-top: 2px groove #bbb;
   }
 
-  tr.total {
-
-  }
   td.current-player {
     background: #dbeeff;
   }
@@ -184,26 +181,6 @@ table.table-stats {
     height: 30px;
   }
 
-  .played-up,
-  .played-down {
-    position: absolute;
-  }
-  .played-up {
-    color: #3c763d;
-    top: -8px;
-    left: 50%;
-    margin-left: -2px;
-  }
-  .played-down {
-    color: #a94442;
-    bottom: -8px;
-    left: 50%;
-    margin-left: -2px;
-  }
-  .played-normal {
-    display: none;
-  }
-
   .league-offset {
     display: none;
     position: absolute;
@@ -211,6 +188,33 @@ table.table-stats {
     top: 0;
     margin-right: -32px;
     font-weight: bold;
+
+    &.played-up {
+      color: #3c763d;
+
+      .league-offset-icon {
+        top: -8px;
+        left: 50%;
+        margin-left: -2px;
+      }
+    }
+    &.played-down {
+      color: #a94442;
+
+      .league-offset-icon {
+        bottom: -8px;
+        left: 50%;
+        margin-left: -2px;
+      }
+    }
+    &.played-normal {
+      color: #888;
+    }
+
+    &.played-up .league-offset-icon,
+    &.played-down .league-offset-icon {
+      position: absolute;
+    }
 
     .league-offset-value,
     .league-offset-icon {
@@ -220,9 +224,18 @@ table.table-stats {
 
     .league-offset-value {
       margin-left: 2px;
+      font-size: 14px;
+    }
+
+    .league-offset-icon {
+      font-size: 12px;
     }
   }
-  &:hover {
+
+  // show the league offset when hovering or if the overall row or if the current player
+  &:hover,
+  tr.row-0 &,
+  .current-player & {
     .league-offset {
       display: block;
     }

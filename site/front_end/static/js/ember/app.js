@@ -46,19 +46,20 @@ App.LeagueDecoratorComponent = Ember.Component.extend({
     setOffsetValues: function() {
         var league = this.get('league'),
             offset = league.offset,
-            offset_icon_class = 'sort';
+            offset_icon_class = '',
+            offset_class = 'played-normal';
 
         if(offset > 0) {
-            offset_icon_class = 'sort-asc played-up';
+            offset_icon_class = 'sort-asc';
+            offset_class = 'played-up';
         }
         else if(offset < 0) {
-            offset_icon_class = 'sort-desc played-down';
-        }
-        else {
-            offset_icon_class = 'sort played-normal';
+            offset_icon_class = 'sort-desc';
+            offset_class = 'played-down';
         }
 
         this.set('offset_icon_class', offset_icon_class);
+        this.set('offset_class', offset_class);
         this.set('offset', Math.abs(offset));
     }.on('willInsertElement')
 });

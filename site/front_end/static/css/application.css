@@ -172,25 +172,6 @@ table.table-stats td.expandable.expand {
 .league-decorator .league-icon {
   height: 30px;
 }
-.league-decorator .played-up,
-.league-decorator .played-down {
-  position: absolute;
-}
-.league-decorator .played-up {
-  color: #3c763d;
-  top: -8px;
-  left: 50%;
-  margin-left: -2px;
-}
-.league-decorator .played-down {
-  color: #a94442;
-  bottom: -8px;
-  left: 50%;
-  margin-left: -2px;
-}
-.league-decorator .played-normal {
-  display: none;
-}
 .league-decorator .league-offset {
   display: none;
   position: absolute;
@@ -199,6 +180,29 @@ table.table-stats td.expandable.expand {
   margin-right: -32px;
   font-weight: bold;
 }
+.league-decorator .league-offset.played-up {
+  color: #3c763d;
+}
+.league-decorator .league-offset.played-up .league-offset-icon {
+  top: -8px;
+  left: 50%;
+  margin-left: -2px;
+}
+.league-decorator .league-offset.played-down {
+  color: #a94442;
+}
+.league-decorator .league-offset.played-down .league-offset-icon {
+  bottom: -8px;
+  left: 50%;
+  margin-left: -2px;
+}
+.league-decorator .league-offset.played-normal {
+  color: #888;
+}
+.league-decorator .league-offset.played-up .league-offset-icon,
+.league-decorator .league-offset.played-down .league-offset-icon {
+  position: absolute;
+}
 .league-decorator .league-offset .league-offset-value,
 .league-decorator .league-offset .league-offset-icon {
   float: left;
@@ -206,8 +210,14 @@ table.table-stats td.expandable.expand {
 }
 .league-decorator .league-offset .league-offset-value {
   margin-left: 2px;
+  font-size: 14px;
 }
-.league-decorator:hover .league-offset {
+.league-decorator .league-offset .league-offset-icon {
+  font-size: 12px;
+}
+.league-decorator:hover .league-offset,
+tr.row-0 .league-decorator .league-offset,
+.current-player .league-decorator .league-offset {
   display: block;
 }
 .summoner-info {

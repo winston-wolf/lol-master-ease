@@ -118,7 +118,7 @@
                                 {{/each}}
                             </tr>
                             {{#each stat.key_factors as |key_factor row_index|}}
-                                <tr class="total row-{{row_index}}">
+                                <tr class="row-{{row_index}}">
                                     <td rowspan="1" class="group-DISABLED">{{key_factor.name}}</td>
                                     <td class="hide">Overall</td>
                                     {{#each key_factor.totals as |league index|}}
@@ -141,8 +141,8 @@
         <script type="text/x-handlebars" data-template-name="components/league-decorator">
             <img class="league-icon" src="/front_end/images/league-icons/{{lowercase league.name}}.png" title="{{ucwords league.name}}" />
 
-            <div class="league-offset">
-                <i class="fa fa-{{offset_icon_class}} league-offset-icon"></i>
+            <div class="league-offset {{offset_class}}">
+                {{#if offset}}<i class="fa fa-{{offset_icon_class}} league-offset-icon"></i>{{/if}}
                 <span class="league-offset-value">{{offset}}</span>
             </div>
         </script>
