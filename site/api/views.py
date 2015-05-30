@@ -33,7 +33,9 @@ class Stats(restful.Resource):
         end_index = begin_index + 15
 
         # fetch matches from the api
+        logger.warning('getting match history')
         response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index)
+        logger.warning('got {} matches'.format(len(response.get('matches', []))))
 
         if response:
             match_id_strs = []
@@ -65,26 +67,35 @@ class Stats(restful.Resource):
                 if not int(match_id_str) in match_ids_prerecorded_dict:
                     match_ids_to_fetch.append(int(match_id_str))
 
+            logger.warning('match ids to fetch: {}'.format(match_ids_to_fetch))
+
             # fetch match data and store it
             if match_ids_to_fetch:
                 match_requests = []
                 for match_id in match_ids_to_fetch:
+                    logger.warning('adding request for match {}'.format(match_id))
                     match_requests.append((match_id, Request(API_URL_MATCH, region, matchId=match_id, includeTimeline=True)))
 
                 match_stats = []
                 for match_id, match_request in match_requests:
+                    logger.warning('waiting for response from match {}'.format(match_id))
                     _match = match_request.response()
                     if not _match or not 'timeline' in _match:
+                        logger.warning('match was bad or no timeline')
                         continue
 
+                    logger.warning('doing match.get_stats()')
                     match_stats.append(match.get_stats(_match))
 
                     if match_stats:
+                        logger.warning('doing player.get_stats()')
                         player_stats = player.get_stats(match_stats, database)
+                        logger.warning('inserting player {}'.format(summoner['id']))
                         player.insert(player_stats, database, summoner['id'])
 
                         for match_stat in match_stats:
                             try:
+                                logger.warning('inserting match')
                                 match.insert(match_stat, player_stats, database)
                             except Exception:
                                 pass
@@ -152,9 +163,12 @@ class Stats(restful.Resource):
             database.escape(summoner_name)
         ))
 
+        logger.warning('summoner: {}'.format(summoner))
+
         if not summoner:
             try:
                 response = request(API_URL_SUMMONER_SEARCH, region, summonerName=summoner_name)
+                logger.warning('api url summoner search response: {}'.format(response))
 
                 if response is None:
                     return False
@@ -167,6 +181,7 @@ class Stats(restful.Resource):
                     'can_refresh': True,
                 }
             except Exception, e:
+                logger.warning('BAM: {}'.format(e))
                 return False
 
         return summoner
