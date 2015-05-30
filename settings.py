@@ -23,8 +23,9 @@ DATABASE_NAME = 'lol_master_ease'
 # ---------------------------------------------------- #
 
 API_HOST = '{region}.api.pvp.net'
-API_URL_SUMMONER_SEARCH = 'https://{region}.api.pvp.net/api/lol/{region}/v1.4/summoner/by-name/{summonerName}?api_key={apiKey}'
+API_URL_SUMMONER_SEARCH = 'https://{region}.api.pvp.net/api/lol/{region}/v2.2/summoner/by-name/{summonerName}?api_key={apiKey}'
 API_URL_CHAMPIONS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion?champData=image&api_key={apiKey}'
+API_URL_SUMMONER_SPELLS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/summoner-spell?spellData=image&api_key={apiKey}'
 API_URL_MATCH = 'https://{region}.api.pvp.net/api/lol/{region}/v2.2/match/{matchId}?includeTimeline={includeTimeline}&api_key={apiKey}'
 API_URL_MATCH_HISTORY = 'https://{region}.api.pvp.net/api/lol/{region}/v2.2/matchhistory/{summonerId}?rankedQueues=RANKED_SOLO_5x5&beginIndex={beginIndex}&endIndex={endIndex}&api_key={apiKey}'
 API_URL_LEAGUES_CHALLENGER = 'https://{region}.api.pvp.net/api/lol/{region}/v2.5/league/challenger?type=RANKED_SOLO_5x5&api_key={apiKey}'
@@ -42,3 +43,10 @@ MATCH_DELTA_TIMES = {
     'thirtyToEnd': [30, None]
 }
 SEASON_NAME = 'SEASON2015'
+MATCHES_PER_PAGE = 3
+
+# allow local settings override
+try:
+    from settings_local import *
+except ImportError as e:
+    pass
