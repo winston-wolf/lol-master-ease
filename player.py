@@ -20,6 +20,7 @@ def sanitize_name(name):
 def get_stats(match_stats, database):
     players = {}
     region = match_stats[0]['match']['region']
+    platform = match_stats[0]['match']['platform']
     for match_stat in match_stats:
         _region = match_stat['match']['region']
         if not _region == region:
@@ -27,7 +28,7 @@ def get_stats(match_stats, database):
         for player in match_stat['players']:
             summoner_id = player['id']
             if not summoner_id in players:
-                players[summoner_id] = { 'region': _region, 'found_in_database': False, 'name': player['name'] }
+                players[summoner_id] = { 'region': _region, 'platform': platform, 'found_in_database': False, 'name': player['name'] }
 
     # Fetch anything we can locally
     player_ranks = database.fetch_all_dict("""
@@ -83,9 +84,10 @@ def insert(player_stats, database, summoner_id_spidered=0):
     insert_values = []
     for summoner_id, player in player_stats.items():
         if not player['found_in_database'] or summoner_id == summoner_id_spidered:
-            insert_values.append(u"({id}, '{region}', {name}, {searchable_name}, '{rank_tier}', '{rank_division}', {last_spider_datetime}, UTC_TIMESTAMP())".format(
+            insert_values.append(u"({id}, '{region}', '{platform}', {name}, {searchable_name}, '{rank_tier}', '{rank_division}', {last_spider_datetime}, UTC_TIMESTAMP())".format(
                 id=summoner_id,
                 region=player['region'],
+                platform=player['platform'],
                 name=database.escape(player['name']),
                 searchable_name=database.escape(sanitize_name(player['name'])),
                 rank_tier=player['rank_tier'],
@@ -93,17 +95,19 @@ def insert(player_stats, database, summoner_id_spidered=0):
                 last_spider_datetime='UTC_TIMESTAMP()' if summoner_id == summoner_id_spidered else 'NULL',
             ))
 
-    insert_query = u'''
-        INSERT INTO summoners
-        (id, region, name, searchable_name, rank_tier, rank_division, last_spider_datetime, last_update_datetime)
-        VALUES
-        {}
-        ON DUPLICATE KEY UPDATE
-          name = VALUES(name),
-          searchable_name = VALUES(searchable_name),
-          rank_tier = VALUES(rank_tier),
-          rank_division = VALUES(rank_division),
-          last_spider_datetime = IFNULL(VALUES(last_spider_datetime), last_spider_datetime),
-          last_update_datetime = VALUES(last_update_datetime)
-    '''.format(u','.join(insert_values))
-    database.execute(insert_query)
+    if insert_values:
+        insert_query = u'''
+            INSERT INTO summoners
+                (id, region, platform, name, searchable_name, rank_tier, rank_division, last_spider_datetime, last_update_datetime)
+            VALUES
+                {}
+            ON DUPLICATE KEY UPDATE
+                platform = VALUES(platform),
+                name = VALUES(name),
+                searchable_name = VALUES(searchable_name),
+                rank_tier = VALUES(rank_tier),
+                rank_division = VALUES(rank_division),
+                last_spider_datetime = IFNULL(VALUES(last_spider_datetime), last_spider_datetime),
+                last_update_datetime = VALUES(last_update_datetime)
+        '''.format(u','.join(insert_values))
+        database.execute(insert_query)

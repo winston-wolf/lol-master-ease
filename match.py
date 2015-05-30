@@ -20,6 +20,7 @@ def get_stats(match):
     match_stats = {
         "id": match['matchId'],
         "region": match['region'].lower(),
+        "platform": match['platformId'],
         "season": match['season'],
         "queue_type": match['queueType'],
         "total_time_in_minutes": match_total_time_in_minutes,
