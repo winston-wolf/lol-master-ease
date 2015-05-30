@@ -5,7 +5,7 @@ from time import sleep
 
 from db import get_connection
 from settings import API_URL_SUMMONER_SEARCH, API_URL_MATCH_HISTORY, API_URL_MATCH
-from settings import SEASON_NAME, RANK_TIERS
+from settings import SEASON_NAME, RANK_TIERS, MATCHES_PER_PAGE
 from settings import DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME
 
 import player
@@ -16,7 +16,8 @@ api_app = Blueprint('api_app', __name__, url_prefix='/api')
 api = restful.Api(api_app)
 
 parser = reqparse.RequestParser()
-
+import logging
+logger = logging.getLogger('freelo')
 
 # returns a trimmed string value as an argument type
 def str_trimmed(value):
@@ -24,195 +25,184 @@ def str_trimmed(value):
 
 
 class Stats(restful.Resource):
-    def get(self):
-        parser.add_argument('region', type=str_trimmed, required=True)
-        parser.add_argument('summoner_name', type=str_trimmed, required=True)
-        args = parser.parse_args()
-
+    # fetches api matches and stores the ones not yet stored, returning a list of match ids
+    def _fetch_api_matches(self, region, summoner, begin_index):
         database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
 
-        region = args['region'].lower()
-        region_escaped = database.escape(region)
-        summoner_name = args['summoner_name']
-        summoner_name_searchable = player.sanitize_name(summoner_name)
+        # always pull in chunks of 15
+        end_index = begin_index + 15
 
-        # ---------------------------------------------------- #
-        # Find if user exists
-        # ---------------------------------------------------- #
+        # fetch matches from the api
+        response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index)
 
-        fetch_match = True
-        summoner_id = None
-        summoner = database.fetch_one_dict("""
-                SELECT
-                  id,
-                  last_update_datetime < UTC_TIMESTAMP() - INTERVAL 20 MINUTE as `fetch_match`
-                FROM summoners
-                WHERE
-                  region={}
-                  AND searchable_name={}
-                  AND last_update_datetime > UTC_TIMESTAMP() - INTERVAL 7 DAY
-            """.format(
-            region_escaped,
-            database.escape(summoner_name_searchable),
-        ))
-        if summoner:
-            summoner_id = summoner['id']
-            fetch_match = summoner['fetch_match']
-
-        # ---------------------------------------------------- #
-        # Fetch User if needed
-        # ---------------------------------------------------- #
-
-        if not summoner_id:
-            try:
-                response = request(API_URL_SUMMONER_SEARCH, region, summonerName=summoner_name_searchable)
-                if response is None:
-                    raise Exception("BUTTMAD LEVELS RISING")
-
-                summoner_id = response.values()[0]['id']
-            except:
-                abort(404, message="Summoner not found")
-
-        # ---------------------------------------------------- #
-        # Fetch Match if needed
-        # ---------------------------------------------------- #
-
-        match_id = None
-        if fetch_match:
-            recent_matches = request(API_URL_MATCH_HISTORY, region, summonerId=summoner_id, beginIndex=0, endIndex=15).get('matches', [])
-
-            for _match in recent_matches:
+        if response:
+            match_id_strs = []
+            # only include those from this season
+            # NOTE: reverse since results are backwards
+            matches = response.get('matches', [])
+            matches.reverse()
+            for _match in matches:
                 if _match['season'] == SEASON_NAME:
-                    match_id = _match['matchId']
+                    match_id_strs.append(str(_match['matchId']))
 
-            if match_id is None:
-                abort(404, message="Recent game not found")
-
-
-
-            match_exists = database.fetch_one_value("""
-                SELECT
-                    1
-                FROM
-                    `matches`
-                WHERE
-                    match_region = {}
-                    AND match_id = {}
-            """.format(region_escaped, match_id))
-            if not match_exists:
-                response = request(API_URL_MATCH, region, matchId=match_id, includeTimeline=True)
-
-                if not response:
-                    abort(404, message="Match not found")
-
-                match_stats = match.get_stats(response)
-
-                if not match_stats:
-                    abort(404, message="Match stats unavailable")
-
-                # ---------------------------------------------------- #
-                # Get Match Stats
-                # ---------------------------------------------------- #
-
-                player_stats = player.get_stats([match_stats], database)
-
-                try:
-                    match.insert(match_stats, player_stats, database)
-                    player.insert(player_stats, database, summoner_id)
-                except Exception, e:
-                    abort(404, message="Cannot insert match into database: {}".format(e))
-        else:
-            match_id = database.fetch_one_value("""
+            # see which matches are not already in our database
+            match_ids_prerecorded = database.fetch_all_value(u"""
                 SELECT
                     match_id
                 FROM
-                    `matches`
-                WHERE
-                    match_region = {}
-                    AND summoner_id = {}
-                ORDER BY match_create_datetime DESC
-                LIMIT 1
-            """.format(region_escaped, summoner_id))
+                    matches
+                WHERE 1
+                    AND match_region = {}
+                    AND match_id IN ({})
+            """.format(
+                database.escape(region),
+                ",".join(match_id_strs),
+            ))
 
-            if not match_id:
-                abort(404, message="Cached match is missing, try again in 20 minutes")
+            match_ids_prerecorded_dict = {int(match_id): True for match_id in match_ids_prerecorded}
+            match_ids_to_fetch = []
+            for match_id_str in match_id_strs:
+                if not int(match_id_str) in match_ids_prerecorded_dict:
+                    match_ids_to_fetch.append(int(match_id_str))
 
+            # fetch match data and store it
+            if match_ids_to_fetch:
+                match_requests = []
+                for match_id in match_ids_to_fetch:
+                    match_requests.append((match_id, Request(API_URL_MATCH, region, matchId=match_id, includeTimeline=True)))
 
-        # ---------------------------------------------------- #
-        # Fetch Match IDs
-        # ---------------------------------------------------- #
+                match_stats = []
+                for match_id, match_request in match_requests:
+                    _match = match_request.response()
+                    if not _match or not 'timeline' in _match:
+                        continue
 
-        # Find match IDs that have not been touched yet
-        # And are in this season
-        match_ids_to_fetch = []
-        response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner_id, beginIndex=0, endIndex=15)
-        if not response:
-            abort(404, 'No matches found')
+                    match_stats.append(match.get_stats(_match))
 
-        recent_matches = response.get('matches', [])
-        recent_matches.reverse() # reverse since results are backwards
-        match_history_index = {}
-        match_ids = []
-        for _match in recent_matches:
-            if _match['season'] == SEASON_NAME:
-                match_ids.append(_match['matchId'])
-                match_history_index[_match['matchId']] = {
-                    'region': _match['region'],
-                    'platformId': _match['platformId'],
-                }
-        match_ids = match_ids[:3]
-        match_id_strs = [str(match_id) for match_id in match_ids]
+                    if match_stats:
+                        player_stats = player.get_stats(match_stats, database)
+                        player.insert(player_stats, database, summoner['id'])
 
-        # if we found no matches this season, BAIL
-        if not match_ids:
-            abort(404, 'No matches found (after filtering)')
+                        for match_stat in match_stats:
+                            try:
+                                match.insert(match_stat, player_stats, database)
+                            except Exception:
+                                pass
 
-        # Find all matches we've already fetched
-        match_ids_prerecorded = database.fetch_all_value(u"""
-            SELECT match_id from matches where match_region = '{}' AND match_id IN ({})
+        # set the refresh datetime
+        database.execute(u"""
+            UPDATE
+                summoners
+            SET
+                last_refresh_datetime = UTC_TIMESTAMP()
+            WHERE 1
+                AND region = {}
+                AND id = {}
         """.format(
-            region,
-            ",".join(match_id_strs)
+            database.escape(region),
+            summoner['id'],
         ))
 
-        match_ids_prerecorded_dict = {int(match_id): True for match_id in match_ids_prerecorded}
-        for match_id in match_ids:
-            if not match_id in match_ids_prerecorded_dict:
-                match_ids_to_fetch.append(match_id)
+    def _get_match_ids(self, region, summoner, begin_index, end_index):
+        database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
 
-        # ---------------------------------------------------- #
-        # Fetch Matches
-        # ---------------------------------------------------- #
+        # if loading a fresh page and a refresh is possible, pull new data from the api
+        if begin_index == 0 and summoner['can_refresh']:
+            self._fetch_api_matches(region, summoner, begin_index)
 
-        if match_ids_to_fetch:
-            match_requests = []
-            for match_id in match_ids_to_fetch:
-                match_requests.append((match_id, Request(API_URL_MATCH, region, matchId=match_id, includeTimeline=True)))
+        # fetch matches from the database
+        match_ids = database.fetch_all_value(u"""
+            SELECT
+                match_id
+            FROM
+                matches
+            WHERE 1
+                AND match_region = {}
+                AND summoner_id = {}
+            ORDER BY
+                match_create_datetime DESC
+            LIMIT {}
+            OFFSET {}
+        """.format(
+            database.escape(region),
+            summoner['id'],
+            (end_index - begin_index),
+            begin_index,
+        ))
 
-            match_stats = []
-            for match_id, match_request in match_requests:
-                _match = match_request.response()
-                if not _match or not 'timeline' in _match:
-                    continue
+        return match_ids
 
-                match_stats.append(match.get_stats(_match))
+    def _get_summoner(self, region, summoner_name):
+        database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
 
-                if match_stats:
-                    player_stats = player.get_stats(match_stats, database)
-                    player.insert(player_stats, database, summoner_id)
+        summoner = database.fetch_one_dict(u"""
+            SELECT
+                id,
+                platform,
+                last_refresh_datetime < UTC_TIMESTAMP() - INTERVAL 20 MINUTE as `can_refresh`
+            FROM
+                summoners
+            WHERE 1
+                AND region = {}
+                AND searchable_name = {}
+                AND last_update_datetime > UTC_TIMESTAMP() - INTERVAL 7 DAY
+                AND last_refresh_datetime IS NOT NULL
+        """.format(
+            database.escape(region),
+            database.escape(summoner_name)
+        ))
 
-                    for match_stat in match_stats:
-                        try:
-                            match.insert(match_stat, player_stats, database)
-                        except Exception, e:
-                            pass
+        if not summoner:
+            try:
+                response = request(API_URL_SUMMONER_SEARCH, region, summonerName=summoner_name)
 
+                if response is None:
+                    return False
 
+                data = response.get(summoner_name)
 
+                summoner = {
+                    'id': data.get('summonerId'),
+                    'platform': data.get('currentUser').get('platformId'),
+                    'can_refresh': True,
+                }
+            except Exception, e:
+                return False
+
+        return summoner
+
+    def get(self):
+        database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
+
+        # process args
+        parser.add_argument('region', type=str_trimmed, required=True)
+        parser.add_argument('summoner_name', type=str_trimmed, required=True)
+        parser.add_argument('page', type=int)
+        args = parser.parse_args()
+        region = args['region'].lower()
+        summoner_name = args['summoner_name']
+        page = args['page']
+        if not page:
+            page = 1
+
+        # set begin and end indexes
+        begin_index = (page - 1) * MATCHES_PER_PAGE
+        end_index = begin_index + MATCHES_PER_PAGE
+
+        # get the summoner
+        summoner = self._get_summoner(region, player.sanitize_name(summoner_name))
+        if not summoner:
+            abort(404, error_key='SUMMONER_NOT_FOUND')
+
+        # get match ids
+        match_ids = self._get_match_ids(region, summoner, begin_index, end_index)
 
         # ---------------------------------------------------- #
         # Pull Game
         # ---------------------------------------------------- #
+
+        if not match_ids:
+            abort(404, error_key='NO_MATCHES_FOUND')
 
         stats_combined = []
         for match_id in match_ids:
@@ -306,7 +296,7 @@ class Stats(restful.Resource):
                                     match_id = {match_id}
                                     AND match_region = {region}
                             ) q1
-                        INNER JOIN aggregate_freelo_deviations afd ON afd.champion_role = q1.role
+                        LEFT JOIN aggregate_freelo_deviations afd ON afd.champion_role = q1.role
                             AND afd.champion_id = q1.summoner_champion_id
                         INNER JOIN summoner_spells sum_icon1 ON sum_icon1.id = q1.summoner_spell_1_id
                         INNER JOIN summoner_spells sum_icon2 ON sum_icon2.id = q1.summoner_spell_2_id
@@ -325,18 +315,36 @@ class Stats(restful.Resource):
                 ORDER BY q2.summoner_team_id, q2.summoner_id != {summoner_id}
             """.format(
                 match_id=match_id,
-                region=region_escaped,
-                summoner_id=summoner_id,
+                region=database.escape(region),
+                summoner_id=summoner['id'],
             ))
 
             # due to the ordering, the current player is either 1st or 5th
             # if the current player isn't 1st, then swap the last 5 with the first 5
-            if player_game_data[0]['summoner_id'] != summoner_id:
+            if player_game_data[0]['summoner_id'] != summoner['id']:
                 player_game_data = player_game_data[5:] + player_game_data[:5]
 
             # ---------------------------------------------------- #
             # Predefine Stats
             # ---------------------------------------------------- #
+            """
+            Platform correction queries:
+
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'RU' WHERE `region` = 'ru';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'BR1' WHERE `region` = 'br';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'OC1' WHERE `region` = 'oce';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'EUW1' WHERE `region` = 'euw';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'EUN1' WHERE `region` = 'eune';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'KR' WHERE `region` = 'kr';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'LA1' WHERE `region` = 'lan';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'LA2' WHERE `region` = 'las';
+            UPDATE `lol_master_ease`.`summoners` SET `platform` = 'TR1' WHERE `region` = 'tr';
+            """
+
+            if player_game_data[0]['match_region'] == 'kr':
+                match_history_url = 'http://matchhistory.leagueoflegends.co.kr/ko/#match-details/KR/{}/{}'.format(match_id, summoner['id'])
+            else:
+                match_history_url = 'http://matchhistory.{}.leagueoflegends.com/en/#match-details/{}/{}/{}'.format(player_game_data[0]['match_region'], summoner['platform'], match_id, summoner['id'])
 
             stats = {
                 'id': match_id,
@@ -345,7 +353,7 @@ class Stats(restful.Resource):
                 'match_total_time_in_minutes': player_game_data[0]['match_total_time_in_minutes'],
                 'current_player_team_red': player_game_data[0]['summoner_team_id'] == 200,
                 'current_player_won': player_game_data[0]['summoner_is_winner'] == 1,
-                'match_history_url': 'http://matchhistory.{}.leagueoflegends.com/en/#match-details/{}/{}/{}'.format(match_history_index[match_id]['region'], match_history_index[match_id]['platformId'], match_id, summoner_id),
+                'match_history_url': match_history_url,
                 'players': [],
                 'key_factors': [
                     {
@@ -447,6 +455,9 @@ class Stats(restful.Resource):
 
                 rank_id = player_game['summoner_rank_tier_id'] or average_rank
                 def get_diffed_rank(offset):
+                    if offset is None:
+                        return {'id': -1, 'name': 'unranked', 'offset': 0}
+
                     diffed_rank = rank_id + int(offset)
 
                     if diffed_rank > RANK_MAX:
@@ -473,7 +484,10 @@ class Stats(restful.Resource):
 
             stats_combined.append(stats)
 
-        return {'stats':stats_combined}
+        if not stats_combined:
+            abort(404, error_key='NO_MATCHES_FOUND')
+
+        return {'page': page, 'stats':stats_combined}
 
 
 api.add_resource(Stats, '/1.0/stats')

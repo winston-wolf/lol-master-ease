@@ -10,18 +10,64 @@ App.Stat = DS.Model.extend({
 });
 
 App.StatsController = Ember.ArrayController.extend({
-    needs: ['summonerSearch']
+    needs: ['summonerSearch'],
+    actions: {
+        show_more: function() {
+            this.fetch_more_stats();
+        }
+    },
+    fetch_more_stats: function() {
+        var self = this,
+            region = this.get('region'),
+            summoner_name = this.get('summoner_name'),
+            page = this.get('page') + 1;
+
+        this.set('page', page);
+        this.set('loading_more', true);
+
+        // when loading past the 1st page, we are "loading more"
+        if(page > 1) {
+            this.set('loading_more', true);
+        }
+
+        return jQuery.getJSON('/api/1.0/stats?region='+region+'&summoner_name='+summoner_name+'&page='+page).done(function(resp) {
+            var stats = self.get('stats');
+            self.set('stats', stats.concat(resp.stats));
+            self.set('loading', false);
+            self.set('loading_more', false);
+        }).fail(function(resp) {
+            // show error
+            if(isset(resp, 'responseJSON', 'error_key')) {
+                var error_key = resp.responseJSON.error_key;
+                if(page > 1 && error_key == 'NO_MATCHES_FOUND') {
+                    self.set('no_more_matches', true);
+                }
+                else {
+                    self.set('error', get_error(resp.responseJSON.error_key));
+                }
+                self.set('loading', false);
+                self.set('loading_more', false);
+            }
+        });
+    }
 });
 
 App.StatsRoute = Ember.Route.extend({
     beforeModel: function() {
         // enable the summoner search in the header
         this.controllerFor('application').set('header_summoner_search', true);
+        console.log('stats -- before model');
+        console.log('loading = ', this.controllerFor('stats').get('loading'))
     },
     setupController: function(controller, model) {
-        controller.set('stats', model);
+        console.log('stats -- setupController')
+    },
+    afterModel: function() {
+        console.log('stats -- after model');
     },
     model: function(params) {
+        console.log('stats -- model');
+
         var self = this,
             controller = this.controllerFor('stats');
 
@@ -29,17 +75,13 @@ App.StatsRoute = Ember.Route.extend({
         summonerSearchController.set('summoner_name', params.summoner_name);
         summonerSearchController.set('region', params.region);
 
-        return self.store.find('stat', { region: params.region, summoner_name: params.summoner_name }).then(function(resp) {
-            localStorage.setItem('region', params.region);
-            localStorage.setItem('summoner_name', params.summoner_name);
-
-            controller.set('region', params.region);
-            controller.set('summoner_name', params.summoner_name);
-
-            return resp;
-        }, function() {
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        });
+        controller.set('error', false);
+        controller.set('loading', true);
+        controller.set('region', params.region);
+        controller.set('summoner_name', params.summoner_name);
+        controller.set('page', 0);
+        controller.set('stats', []);
+        controller.fetch_more_stats();
     }
 });
 

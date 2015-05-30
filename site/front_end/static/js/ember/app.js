@@ -1,7 +1,25 @@
 App = Ember.Application.create();
 
 var REGIONS = ['BR','EUNE','EUW','KR','LAN','LAS','NA','OCE','RU','TR'],
-    DEFAULT_REGION = 'NA';
+    DEFAULT_REGION = 'NA',
+    ERROR_INDEX = {
+        'SUMMONER_NOT_FOUND': {
+            'message': 'We couldn\'t find the summoner you are looking for.',
+            'tips': ['Misspelled summoner name?', 'Is the region right?', 'Did you fat finger something?', 'Maybe they don\'t exist.']
+        },
+        'NO_MATCHES_FOUND': {
+            'message': 'No matches found for this summoner.',
+            'tips': ['Maybe they should play more.', 'Have they played solo queue this season?', 'Do they even LoL?', 'Looks like they could use a duo partner.']
+        }
+    };
+
+function get_error(error_key) {
+    var error = ERROR_INDEX[error_key];
+    return {
+        'message': error.message,
+        'tip': error.tips[Math.floor(Math.random()*error.tips.length)]
+    };
+}
 
 App.ApplicationRoute = Ember.Route.extend({
     model: function() {
