@@ -1,3 +1,4 @@
+Ember.deprecate = function(){};
 App = Ember.Application.create();
 
 var REGIONS = ['BR','EUNE','EUW','KR','LAN','LAS','NA','OCE','RU','TR'],
