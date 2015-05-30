@@ -54,11 +54,14 @@ def get_stats(match_stats, database):
     requests = []
     for summoner_id, player in players.items():
         if not 'rank' in player:
+            logger.warning('adding request for player {}'.format(summoner_id))
             requests.append((summoner_id, player, Request(API_URL_LEAGUES_RANK, region, summonerId=summoner_id)))
 
     for summoner_id, player, _request in requests:
         try:
+            logger.warning('waiting for response for player {}'.format(summoner_id))
             response = _request.response()
+            logger.warning('got response')
             found = False
             rankings = response.get(str(summoner_id))
             if rankings:
