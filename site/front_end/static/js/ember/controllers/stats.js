@@ -56,18 +56,14 @@ App.StatsRoute = Ember.Route.extend({
     beforeModel: function() {
         // enable the summoner search in the header
         this.controllerFor('application').set('header_summoner_search', true);
-        console.log('stats -- before model');
-        console.log('loading = ', this.controllerFor('stats').get('loading'))
     },
     setupController: function(controller, model) {
-        console.log('stats -- setupController')
+
     },
     afterModel: function() {
-        console.log('stats -- after model');
+
     },
     model: function(params) {
-        console.log('stats -- model');
-
         var self = this,
             controller = this.controllerFor('stats');
 
