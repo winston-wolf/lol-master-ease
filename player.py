@@ -53,7 +53,7 @@ def get_stats(match_stats, database):
     # Fetch missing players
     requests = []
     for summoner_id, player in players.items():
-        if not 'rank' in player:
+        if not 'rank_tier' in player:
             logger.warning('adding request for player {}'.format(summoner_id))
             requests.append((summoner_id, player, Request(API_URL_LEAGUES_RANK, region, summonerId=summoner_id)))
 
