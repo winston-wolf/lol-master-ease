@@ -33,7 +33,7 @@ class Stats(restful.Resource):
         end_index = begin_index + 15
 
         # fetch matches from the api
-        logger.warning('getting match history')
+        logger.warning('adding request for match history of {}'.format(summoner['id']))
         response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index)
         logger.warning('got {} matches'.format(len(response.get('matches', []))))
 
@@ -150,14 +150,13 @@ class Stats(restful.Resource):
             SELECT
                 id,
                 platform,
-                last_refresh_datetime < UTC_TIMESTAMP() - INTERVAL 20 MINUTE as `can_refresh`
+                IF(last_refresh_datetime < UTC_TIMESTAMP() - INTERVAL 20 MINUTE OR last_refresh_datetime IS NULL, 1, 0) as `can_refresh`
             FROM
                 summoners
             WHERE 1
                 AND region = {}
                 AND searchable_name = {}
                 AND last_update_datetime > UTC_TIMESTAMP() - INTERVAL 7 DAY
-                AND last_refresh_datetime IS NOT NULL
         """.format(
             database.escape(region),
             database.escape(summoner_name)
@@ -167,6 +166,7 @@ class Stats(restful.Resource):
 
         if not summoner:
             try:
+                logger.warning('adding request for summoner {}'.format(summoner_name))
                 response = request(API_URL_SUMMONER_SEARCH, region, summonerName=summoner_name)
                 logger.warning('api url summoner search response: {}'.format(response))
 
