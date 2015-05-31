@@ -312,7 +312,7 @@ class Stats(restful.Resource):
                                     AND match_region = {region}
                             ) q1
                         LEFT JOIN aggregate_freelo_deviations afd ON afd.champion_role = q1.role
-                            AND afd.champion_id = q1.summoner_champion_id
+                            AND afd.champion_id = (CASE q1.summoner_champion_id WHEN 245 THEN 92 ELSE q1.summoner_champion_id END)
                         INNER JOIN summoner_spells sum_icon1 ON sum_icon1.id = q1.summoner_spell_1_id
                         INNER JOIN summoner_spells sum_icon2 ON sum_icon2.id = q1.summoner_spell_2_id
                         GROUP BY
@@ -333,6 +333,7 @@ class Stats(restful.Resource):
                 region=database.escape(region),
                 summoner_id=summoner['id'],
             ))
+            #TODO: disable the Ekko/Riven quick fix in the "LEFT JOIN aggregate_freelo_deviations" section above (swapping 92 for 245 on q1.summoner_champion_id check)
 
             # due to the ordering, the current player is either 1st or 5th
             # if the current player isn't 1st, then swap the last 5 with the first 5
