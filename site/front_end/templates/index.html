@@ -71,6 +71,129 @@
             </div>
         </script>
 
+        <script type="text/x-handlebars" data-template-name="matches">
+            <div class="matches">
+                <div class="container">
+                    {{#if loading}}
+                        <h2>
+                            <i class="fa fa-spinner fa-spin"></i> Loading...
+                        </h2>
+                    {{else}}
+                        {{#if error}}
+                            <h2>{{error.message}}</h2>
+                            {{#if error.tip}}
+                                <p class="lead">{{error.tip}}</p>
+                            {{/if}}
+                        {{/if}}
+
+                        {{#if matches}}
+                            <h2>Latest Ranked Solo Queue Games</h2>
+                            <div style="margin-bottom: 35px;">
+                                <img src="/front_end/images/league-icons/bronze.png" title="Bronze" />
+                                ⇨
+                                <img src="/front_end/images/league-icons/silver.png" title="Silver" />
+                                ⇨
+                                <img src="/front_end/images/league-icons/gold.png" title="Gold" />
+                                ⇨
+                                <img src="/front_end/images/league-icons/platinum.png" title="Platinum" />
+                                ⇨
+                                <img src="/front_end/images/league-icons/diamond.png" title="Diamond" />
+                                ⇨
+                                <img src="/front_end/images/league-icons/master.png" title="Master" />
+                                ⇨
+                                <img src="/front_end/images/league-icons/challenger.png" title="Challenger" />
+                            </div>
+                        {{/if}}
+
+                        {{#each matches as |match|}}
+                            <div class="match">
+                                <div class="match-summary {{if match.player.summoner_is_winner 'victory' 'defeat'}}">
+                                    {{player-info player=match.player class="summoner-info-container"}}
+
+                                    <div class="overall-league-decorator">
+                                        {{#if match.stats}}
+                                            {{league-decorator league=match.stats.key_factors.[0].totals.[0]}}
+                                        {{else}}
+                                            Loading stats...
+                                        {{/if}}
+                                    </div>
+
+                                    <div class="stats-button">
+                                        {{#if match.stats}}
+                                            {{#if match.stats_showing}}
+                                                <button class="btn btn-default" {{action 'hide_stats' match}}>Hide Stats</button>
+                                            {{else}}
+                                                <button class="btn btn-default" {{action 'show_stats' match}}>Show Stats</button>
+                                            {{/if}}
+                                        {{/if}}
+                                    </div>
+
+                                    <div class="match-time">
+                                        <div>{{humandate match.create_datetime}}</div>
+                                        <div>{{match.match_total_time_in_minutes}} minutes</div>
+                                    </div>
+
+                                    <div class="match-history">
+                                        <a href="{{match.match_history_url}}" target="_blank">Match History</a>
+                                    </div>
+                                </div>
+                                {{#if match.stats}}
+                                    {{#if match.stats_showing}}
+                                        <div class="match-stats">
+                                            <table class="table table-striped table-stats">
+                                                <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                    <td colspan="5" class="game-conclusion-left">{{if match.stats.current_player_won 'VICTORY' 'DEFEAT'}}</td>
+                                                    <td colspan="5" class="game-conclusion-right">{{if match.stats.current_player_won 'DEFEAT' 'VICTORY'}}</td>
+                                                </tr>
+                                                <tr class="header">
+                                                    <td class="expand-all-DISABLED"><i class="hide fa fa-plus-square-o"></i></td>
+                                                    <td class="hide"></td>
+                                                    {{#each match.stats.players as |player index|}}
+                                                        <td class="{{player_classes match.stats.current_player_team_red index=index}}">
+                                                            {{player-info player=player}}
+                                                            <div class="team-border"></div>
+                                                        </td>
+                                                    {{/each}}
+                                                </tr>
+                                                {{#each match.stats.key_factors as |key_factor row_index|}}
+                                                    <tr class="row-{{row_index}}">
+                                                        <td rowspan="1" class="group-DISABLED">{{key_factor.name}}</td>
+                                                        <td class="hide">Overall</td>
+                                                        {{#each key_factor.totals as |league index|}}
+                                                            <td class="{{player_classes match.stats.current_player_team_red index=index}}">
+                                                                {{league-decorator league=league}}
+                                                            </td>
+                                                        {{/each}}
+                                                    </tr>
+                                                {{/each}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {{/if}}
+                                {{/if}}
+                            </div>
+                        {{/each}}
+
+                        {{#if matches}}
+                            <div class="show-more-container">
+                                {{#if loading_more}}
+                                    <i class="fa fa-spinner fa-spin"></i> Loading...
+                                {{else}}
+                                    {{#if no_more_matches}}
+                                        We are unable to pull more matches at this time.
+                                    {{else}}
+                                        <div class="btn btn-danger btn-lg" {{action 'show_more'}}>Show More</div>
+                                    {{/if}}
+                                {{/if}}
+                            </div>
+                        {{/if}}
+                    {{/if}}
+                </div>
+            </div>
+        </script>
+
         <script type="text/x-handlebars" data-template-name="stats">
             <div class="my-stats">
                 <div class="container">
@@ -174,25 +297,17 @@
 
         <script type="text/x-handlebars" data-template-name="components/player-info">
             <div class="summoner-info">
-                <img class="summoner-champion-icon" src="{{player.champion.image_icon_url}}" />
+                <img class="summoner-champion-icon" src="{{player.summoner_champion.image_icon_url}}" />
                 <div class="summoner-spell-book">
                     <img class="summoner-spell-icon" src="{{player.summoner_spell_1_icon_url}}" />
                     <img class="summoner-spell-icon" src="{{player.summoner_spell_2_icon_url}}" />
                 </div>
-                <div class="summoner-champion-level">{{player.summoner_champion_level}}</div>
+                <div class="summoner-champion-level">{{player.summoner_champion.level}}</div>
             </div>
-            <div>{{#link-to 'stats' player.region player.summoner_name class="player-link" title=player.summoner_name}}{{player.summoner_name}}{{/link-to}}</div>
-            <div class="stat-score"><span class="icon"></span><span class="value">{{player.summoner_kills}}/{{player.summoner_deaths}}/{{player.summoner_assists}}</span></div>
-            <div class="stat-minions"><span class="icon"></span><span class="value">{{player.summoner_cs}}</span></div>
-        </script>
-
-        <script type="text/x-handlebars" data-template-name="loading">
-            <div class="my-stats">
-                <div class="container">
-                    <h2>
-                        <i class="fa fa-spinner fa-spin"></i> Loading...
-                    </h2>
-                </div>
+            <div class="summoner-name">{{#link-to 'matches' player.region player.summoner_name class="player-link" title=player.summoner_name}}{{player.summoner_name}}{{/link-to}}</div>
+            <div class="stat-container">
+                <div class="stat-score"><span class="icon"></span><span class="value">{{player.summoner_kills}}/{{player.summoner_deaths}}/{{player.summoner_assists}}</span></div>
+                <div class="stat-minions"><span class="icon"></span><span class="value">{{player.summoner_cs}}</span></div>
             </div>
         </script>
 
@@ -228,6 +343,6 @@
         <script src="/front_end/js/ember/app.js"></script>
         <script src="/front_end/js/ember/router.js"></script>
         <script src="/front_end/js/ember/controllers/index.js"></script>
-        <script src="/front_end/js/ember/controllers/stats.js"></script>
+        <script src="/front_end/js/ember/controllers/matches.js"></script>
     </body>
 </html>

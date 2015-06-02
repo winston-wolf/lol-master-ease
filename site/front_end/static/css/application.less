@@ -1,3 +1,11 @@
+.group {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
 body {
   background: #fff;
 }
@@ -50,7 +58,7 @@ body {
   padding-top: 10px;
 }
 
-.my-stats {
+.matches {
   padding-top: 35px;
   padding-bottom: 40px;
   text-align: center;
@@ -63,10 +71,8 @@ body {
 }
 
 table.table-stats {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
   background: #fff;
+  margin-bottom: 0;
 
   tr.header {
 //    td {
@@ -176,6 +182,7 @@ table.table-stats {
 
 .league-decorator {
   position: relative;
+  display: inline-block;
 
   .league-icon {
     height: 30px;
@@ -184,9 +191,10 @@ table.table-stats {
   .league-offset {
     display: none;
     position: absolute;
-    right: 50%;
-    top: 0;
-    margin-right: -32px;
+    left: 0;
+    top: 50%;
+    margin-left: 36px;
+    margin-top: -15px;
     font-weight: bold;
 
     &.played-up {
@@ -243,20 +251,20 @@ table.table-stats {
 }
 
 .summoner-info {
+  .group;
   position: relative;
-  overflow: hidden;
   margin: 0 auto;
   width: 64px;
 
   .summoner-champion-icon {
-    height: 42px;
+    width: 42px;
     float: left;
   }
 
   .summoner-champion-level {
     position: absolute;
-    bottom: 2px;
-    left: 2px;
+    bottom: 3px;
+    left: 4px;
     color: #fff;
     font-weight: bold;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -273,7 +281,7 @@ table.table-stats {
     .summoner-spell-icon {
       display: block;
       margin-top: 2px;
-      height: 20px;
+      width: 20px;
 
       &:first-child {
         margin-top: 0;
@@ -282,7 +290,7 @@ table.table-stats {
   }
 }
 
-// Stats
+// matches
 .stat-score,
 .stat-minions {
   white-space: nowrap;
@@ -325,3 +333,153 @@ table.table-stats {
   white-space: nowrap;
 }
 
+.match {
+  background: #fff;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  .match-summary {
+    .group;
+    display: table;
+    width: 100%;
+    position: relative;
+    padding: 10px;
+
+    &.victory {
+      border-left: 10px solid rgb(99, 192, 99);
+    }
+    &.defeat {
+      border-left: 10px solid rgb(166, 57, 53);
+    }
+
+    .summoner-info-container {
+      display: table-cell;
+      vertical-align: middle;
+      width: 200px;
+
+      .summoner-info {
+        float: left;
+        width: 91px;
+
+        .summoner-champion-icon {
+          width: 60px;
+        }
+
+        .summoner-champion-level {
+          font-size: 14px;
+          line-height: 14px;
+        }
+
+
+        .summoner-spell-book {
+          width: 29px;
+          height: 60px;
+
+          .summoner-spell-icon {
+            width: 29px;
+          }
+        }
+      }
+      .summoner-name {
+        display: none;
+      }
+      .stat-container {
+        float: left;
+        margin-left: 10px;
+        padding-top: 9px;
+        text-align: left;
+
+        .stat-score,
+        .stat-minions {
+          .icon {
+            width: 18px;
+            height: 21px;
+            background-size: 30px 30px;
+          }
+          .value {
+            font-size: 15px;
+            line-height: 15px;
+          }
+        }
+      }
+    }
+
+    .overall-league-decorator {
+      display: table-cell;
+      vertical-align: middle;
+      padding-left: 10px;
+      text-align: left;
+
+      .league-decorator {
+        .league-icon {
+          height: 40px;
+        }
+
+        .league-offset {
+          display: block;
+          margin-left: 52px;
+
+          .league-offset-icon {
+            font-size: 16px;
+            margin-left: -3px;
+          }
+          &.played-up {
+            .league-offset-icon {
+              top: -10px;
+            }
+          }
+          &.played-down {
+            .league-offset-icon {
+              bottom: -10px;
+            }
+          }
+          .league-offset-value {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    .items {
+      display: table-cell;
+      vertical-align: middle;
+      padding-left: 20px;
+    }
+
+    .stats-button {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+      white-space: nowrap;
+      width: 1px;
+      padding-left: 20px;
+    }
+
+    .match-time {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+      white-space: nowrap;
+      width: 1px;
+      padding-left: 20px;
+    }
+
+    .match-history {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: right;
+      white-space: nowrap;
+      width: 1px;
+      padding-left: 20px;
+    }
+  }
+}
+
+.show-more-container {
+  margin-top: 10px;
+  padding: 10px;
+}

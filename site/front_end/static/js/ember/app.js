@@ -109,7 +109,7 @@ App.SummonerSearchView = Ember.View.extend({
             summoner_name = controller.get('summoner_name').trim(),
             region = controller.get('region');
 
-        controller.transitionToRoute('stats', region, summoner_name);
+        controller.transitionToRoute('matches', region, summoner_name);
     }
 });
 

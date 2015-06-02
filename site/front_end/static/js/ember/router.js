@@ -4,5 +4,5 @@ App.Router.reopen({
 
 App.Router.map(function() {
     this.resource('index', { path: '/' });
-    this.resource('stats', { path: '/summoner/:region/:summoner_name' });
+    this.resource('matches', { path: '/summoner/:region/:summoner_name' });
 });
