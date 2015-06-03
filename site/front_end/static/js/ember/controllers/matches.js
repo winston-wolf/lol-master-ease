@@ -1,22 +1,32 @@
-App.Stat = DS.Model.extend({
-    game_id: DS.attr(),
-    current_player_team_red: DS.attr(),
-    current_player_won: DS.attr(),
-    match_total_time_in_minutes: DS.attr(),
+App.Match = DS.Model.extend({
     create_datetime: DS.attr(),
-    match_history_url: DS.attr(),
-    players: DS.attr(),
-    key_factors: DS.attr()
+    match_total_time_in_minutes: DS.attr(),
+    player: DS.attr(),
+    stats: DS.attr(),
+    stats_showing: DS.attr()
 });
 
-App.StatsController = Ember.ArrayController.extend({
+App.MatchesController = Ember.ArrayController.extend({
     needs: ['summonerSearch'],
     actions: {
         show_more: function() {
-            this.fetch_more_stats();
+            this.fetch_more_matches();
         }
     },
-    fetch_more_stats: function() {
+    fetch_match_stats: function(match) {
+        var region = this.get('region'),
+            summoner_name = this.get('summoner_name');
+
+        match.set('loading_stats', true);
+
+        jQuery.getJSON('/api/1.0/matches/'+match.get('match_id')+'/stats?region='+region+'&summoner_name='+summoner_name).done(function(resp) {
+            match.set('stats', resp.stats);
+            match.set('loading_stats', false);
+        }).fail(function(resp) {
+            match.set('loading_stats', false);
+        });
+    },
+    fetch_more_matches: function() {
         var self = this,
             region = this.get('region'),
             summoner_name = this.get('summoner_name'),
@@ -30,11 +40,29 @@ App.StatsController = Ember.ArrayController.extend({
             this.set('loading_more', true);
         }
 
-        return jQuery.getJSON('/api/1.0/stats?region='+region+'&summoner_name='+summoner_name+'&page='+page).done(function(resp) {
-            var stats = self.get('stats');
-            self.set('stats', stats.concat(resp.stats));
+        return jQuery.getJSON('/api/1.0/matches?region='+region+'&summoner_name='+summoner_name+'&page='+page).done(function(resp) {
+            var new_matches = [];
+            var matches_needing_stats = [];
+            for(var i=0, n=resp.matches.length; i<n; ++i) {
+                var new_match = self.store.createRecord('match', resp.matches[i]);
+
+                // record which matches to pull stats for
+                if(!new_match.get('stats')) {
+                    matches_needing_stats.push(new_match);
+                }
+
+                new_matches.push(new_match);
+            }
+
+            var matches = self.get('matches');
+            self.set('matches', matches.concat(new_matches));
             self.set('loading', false);
             self.set('loading_more', false);
+
+            // get stats for matches that need them
+            for(var i=0, n=matches_needing_stats.length; i<n; ++i) {
+                self.fetch_match_stats(matches_needing_stats[i]);
+            }
         }).fail(function(resp) {
             // show error
             if(isset(resp, 'responseJSON', 'error_key')) {
@@ -52,7 +80,7 @@ App.StatsController = Ember.ArrayController.extend({
     }
 });
 
-App.StatsRoute = Ember.Route.extend({
+App.MatchesRoute = Ember.Route.extend({
     beforeModel: function() {
         // enable the summoner search in the header
         this.controllerFor('application').set('header_summoner_search', true);
@@ -65,7 +93,7 @@ App.StatsRoute = Ember.Route.extend({
     },
     model: function(params) {
         var self = this,
-            controller = this.controllerFor('stats');
+            controller = this.controllerFor('matches');
 
         var summonerSearchController = self.controllerFor('summonerSearch');
         summonerSearchController.set('summoner_name', params.summoner_name);
@@ -76,8 +104,8 @@ App.StatsRoute = Ember.Route.extend({
         controller.set('region', params.region);
         controller.set('summoner_name', params.summoner_name);
         controller.set('page', 0);
-        controller.set('stats', []);
-        controller.fetch_more_stats();
+        controller.set('matches', []);
+        controller.fetch_more_matches();
     }
 });
 

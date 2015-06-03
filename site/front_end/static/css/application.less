@@ -1,3 +1,11 @@
+.group {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
 body {
   background: #fff;
 }
@@ -50,7 +58,7 @@ body {
   padding-top: 10px;
 }
 
-.my-stats {
+.matches {
   padding-top: 35px;
   padding-bottom: 40px;
   text-align: center;
@@ -63,10 +71,14 @@ body {
 }
 
 table.table-stats {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
   background: #fff;
+  margin-bottom: 0;
+
+  tr:first-child {
+    td {
+      border-top: 0;
+    }
+  }
 
   tr.header {
 //    td {
@@ -176,6 +188,7 @@ table.table-stats {
 
 .league-decorator {
   position: relative;
+  display: inline-block;
 
   .league-icon {
     height: 30px;
@@ -184,9 +197,10 @@ table.table-stats {
   .league-offset {
     display: none;
     position: absolute;
-    right: 50%;
-    top: 0;
-    margin-right: -32px;
+    left: 0;
+    top: 50%;
+    margin-left: 36px;
+    margin-top: -15px;
     font-weight: bold;
 
     &.played-up {
@@ -242,20 +256,17 @@ table.table-stats {
   }
 }
 
-.summoner-info {
+.summoner-champion {
   position: relative;
-  overflow: hidden;
-  margin: 0 auto;
-  width: 64px;
+  width: 42px;
 
   .summoner-champion-icon {
-    height: 42px;
-    float: left;
+    width: 42px;
   }
 
   .summoner-champion-level {
     position: absolute;
-    bottom: 2px;
+    bottom: 1px;
     left: 2px;
     color: #fff;
     font-weight: bold;
@@ -263,26 +274,39 @@ table.table-stats {
     font-size: 12px;
     line-height: 12px;
   }
+}
 
-  .summoner-spell-book {
-    float: left;
+.summoner-spell-book {
+  width: 20px;
+  height: 42px;
+
+  .summoner-spell-icon {
+    display: block;
+    margin-top: 2px;
     width: 20px;
-    height: 42px;
-    margin-left: 2px;
 
-    .summoner-spell-icon {
-      display: block;
-      margin-top: 2px;
-      height: 20px;
-
-      &:first-child {
-        margin-top: 0;
-      }
+    &:first-child {
+      margin-top: 0;
     }
   }
 }
 
-// Stats
+.summoner-champion-spell-group {
+  .group;
+  margin: 0 auto;
+  width: 64px;
+
+  .summoner-champion {
+    float: left;
+  }
+
+  .summoner-spell-book {
+    float: left;
+    margin-left: 2px;
+  }
+}
+
+// matches
 .stat-score,
 .stat-minions {
   white-space: nowrap;
@@ -325,3 +349,203 @@ table.table-stats {
   white-space: nowrap;
 }
 
+.match-stats {
+  .summoner-name {
+    margin-top: 2px;
+  }
+  .summoner-stats {
+
+  }
+}
+
+.match {
+  background: #fff;
+  margin-top: 5px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  .match-summary {
+    cursor: pointer;
+
+    > div {
+      display: table;
+      width: 100%;
+      border-top: 1px solid #ccc;
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 10px;
+
+      &:hover {
+        background: #eee;
+        border-color: #aaa;
+      }
+    }
+
+    &.victory {
+      border-left: 10px solid rgb(99, 192, 99);
+    }
+    &.defeat {
+      border-left: 10px solid rgb(166, 57, 53);
+    }
+
+    .match-summary-section {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    .summoner-champion-container {
+      width: 60px;
+
+      .summoner-champion {
+        display: table-cell;
+        vertical-align: middle;
+        width: 91px;
+
+        .summoner-champion-icon {
+          width: 60px;
+        }
+
+        .summoner-champion-level {
+          font-size: 14px;
+          line-height: 14px;
+          bottom: 2px;
+          left: 3px;
+        }
+      }
+    }
+
+    .summoner-spell-book-container {
+      width: 29px;
+      padding-left: 2px;
+
+      .summoner-spell-book {
+        display: table-cell;
+        vertical-align: middle;
+        width: 29px;
+        height: 60px;
+
+        .summoner-spell-icon {
+          width: 29px;
+        }
+      }
+      .summoner-name {
+        display: none;
+      }
+    }
+
+    .summoner-stats-container {
+      padding-left: 10px;
+      width: 120px;
+
+      .summoner-stats {
+        display: table-cell;
+        vertical-align: middle;
+        margin-left: 10px;
+        padding-top: 9px;
+        text-align: left;
+
+        .stat-score,
+        .stat-minions {
+          .icon {
+            width: 18px;
+            height: 21px;
+            background-size: 30px 30px;
+          }
+          .value {
+            font-size: 15px;
+            line-height: 15px;
+          }
+        }
+      }
+    }
+
+    .summoner-items-container {
+      width: 271px;
+
+      .summoner-items {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 20px;
+
+        .summoner-item {
+          float: left;
+          margin-left: 1px;
+          vertical-align: middle;
+
+          &:first-child {
+            margin-left: 0;
+          }
+
+          img {
+            width: 35px;
+            height: 35px;
+          }
+          .empty-slot {
+            width: 35px;
+            height: 35px;
+            background: rgba(0, 0, 0, .1);
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, .5) rgba(255, 255, 255, .5) rgba(255, 255, 255, .5) rgba(0, 0, 0, .5)
+          }
+        }
+      }
+    }
+
+    .league-decorator-container {
+      text-align: left;
+      padding-left: 20px;
+
+      .league-decorator {
+        .league-icon {
+          height: 40px;
+        }
+
+        .league-offset {
+          display: block;
+          margin-left: 52px;
+
+          .league-offset-icon {
+            font-size: 16px;
+            margin-left: -3px;
+          }
+          &.played-up {
+            .league-offset-icon {
+              top: -10px;
+            }
+          }
+          &.played-down {
+            .league-offset-icon {
+              bottom: -10px;
+            }
+          }
+          .league-offset-value {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    .match-info-container {
+      text-align: right;
+      white-space: nowrap;
+      width: 1px;
+      padding-left: 20px;
+    }
+  }
+
+  .match-stats {
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
+}
+
+.show-more-container {
+  margin-top: 10px;
+  padding: 10px;
+}
