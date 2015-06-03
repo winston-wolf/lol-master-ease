@@ -74,6 +74,12 @@ table.table-stats {
   background: #fff;
   margin-bottom: 0;
 
+  tr:first-child {
+    td {
+      border-top: 0;
+    }
+  }
+
   tr.header {
 //    td {
 //      white-space: nowrap;
@@ -250,43 +256,53 @@ table.table-stats {
   }
 }
 
-.summoner-info {
-  .group;
+.summoner-champion {
   position: relative;
-  margin: 0 auto;
-  width: 64px;
+  width: 42px;
 
   .summoner-champion-icon {
     width: 42px;
-    float: left;
   }
 
   .summoner-champion-level {
     position: absolute;
-    bottom: 3px;
-    left: 4px;
+    bottom: 1px;
+    left: 2px;
     color: #fff;
     font-weight: bold;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
     font-size: 12px;
     line-height: 12px;
   }
+}
+
+.summoner-spell-book {
+  width: 20px;
+  height: 42px;
+
+  .summoner-spell-icon {
+    display: block;
+    margin-top: 2px;
+    width: 20px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+.summoner-champion-spell-group {
+  .group;
+  margin: 0 auto;
+  width: 64px;
+
+  .summoner-champion {
+    float: left;
+  }
 
   .summoner-spell-book {
     float: left;
-    width: 20px;
-    height: 42px;
     margin-left: 2px;
-
-    .summoner-spell-icon {
-      display: block;
-      margin-top: 2px;
-      width: 20px;
-
-      &:first-child {
-        margin-top: 0;
-      }
-    }
   }
 }
 
@@ -333,9 +349,17 @@ table.table-stats {
   white-space: nowrap;
 }
 
+.match-stats {
+  .summoner-name {
+    margin-top: 2px;
+  }
+  .summoner-stats {
+
+  }
+}
+
 .match {
   background: #fff;
-  border: 1px solid #ccc;
   margin-top: 5px;
 
   &:first-child {
@@ -343,11 +367,21 @@ table.table-stats {
   }
 
   .match-summary {
-    .group;
-    display: table;
-    width: 100%;
-    position: relative;
-    padding: 10px;
+    cursor: pointer;
+
+    > div {
+      display: table;
+      width: 100%;
+      border-top: 1px solid #ccc;
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 10px;
+
+      &:hover {
+        background: #eee;
+        border-color: #aaa;
+      }
+    }
 
     &.victory {
       border-left: 10px solid rgb(99, 192, 99);
@@ -356,13 +390,18 @@ table.table-stats {
       border-left: 10px solid rgb(166, 57, 53);
     }
 
-    .summoner-info-container {
+    .match-summary-section {
       display: table-cell;
       vertical-align: middle;
-      width: 200px;
+      text-align: left;
+    }
 
-      .summoner-info {
-        float: left;
+    .summoner-champion-container {
+      width: 60px;
+
+      .summoner-champion {
+        display: table-cell;
+        vertical-align: middle;
         width: 91px;
 
         .summoner-champion-icon {
@@ -372,23 +411,38 @@ table.table-stats {
         .summoner-champion-level {
           font-size: 14px;
           line-height: 14px;
+          bottom: 2px;
+          left: 3px;
         }
+      }
+    }
 
+    .summoner-spell-book-container {
+      width: 29px;
+      padding-left: 2px;
 
-        .summoner-spell-book {
+      .summoner-spell-book {
+        display: table-cell;
+        vertical-align: middle;
+        width: 29px;
+        height: 60px;
+
+        .summoner-spell-icon {
           width: 29px;
-          height: 60px;
-
-          .summoner-spell-icon {
-            width: 29px;
-          }
         }
       }
       .summoner-name {
         display: none;
       }
-      .stat-container {
-        float: left;
+    }
+
+    .summoner-stats-container {
+      padding-left: 10px;
+      width: 120px;
+
+      .summoner-stats {
+        display: table-cell;
+        vertical-align: middle;
         margin-left: 10px;
         padding-top: 9px;
         text-align: left;
@@ -408,11 +462,43 @@ table.table-stats {
       }
     }
 
-    .overall-league-decorator {
-      display: table-cell;
-      vertical-align: middle;
-      padding-left: 10px;
+    .summoner-items-container {
+      width: 271px;
+
+      .summoner-items {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 20px;
+
+        .summoner-item {
+          float: left;
+          margin-left: 1px;
+          vertical-align: middle;
+
+          &:first-child {
+            margin-left: 0;
+          }
+
+          img {
+            width: 35px;
+            height: 35px;
+          }
+          .empty-slot {
+            width: 35px;
+            height: 35px;
+            background: rgba(0, 0, 0, .1);
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, .5) rgba(255, 255, 255, .5) rgba(255, 255, 255, .5) rgba(0, 0, 0, .5)
+          }
+        }
+      }
+    }
+
+    .league-decorator-container {
       text-align: left;
+      padding-left: 20px;
 
       .league-decorator {
         .league-icon {
@@ -444,38 +530,18 @@ table.table-stats {
       }
     }
 
-    .items {
-      display: table-cell;
-      vertical-align: middle;
-      padding-left: 20px;
-    }
-
-    .stats-button {
-      display: table-cell;
-      vertical-align: middle;
+    .match-info-container {
       text-align: right;
       white-space: nowrap;
       width: 1px;
       padding-left: 20px;
     }
+  }
 
-    .match-time {
-      display: table-cell;
-      vertical-align: middle;
-      text-align: right;
-      white-space: nowrap;
-      width: 1px;
-      padding-left: 20px;
-    }
-
-    .match-history {
-      display: table-cell;
-      vertical-align: middle;
-      text-align: right;
-      white-space: nowrap;
-      width: 1px;
-      padding-left: 20px;
-    }
+  .match-stats {
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
   }
 }
 

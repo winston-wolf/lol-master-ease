@@ -43,8 +43,24 @@ App.ApplicationAdapter = DS.RESTAdapter.extend({
     namespace: 'api/1.0'
 });
 
-// player info
-App.PlayerInfoComponent = Ember.Component.extend({
+// summoner champion
+App.SummonerChampionComponent = Ember.Component.extend({
+    classNames: ['summoner-champion']
+});
+
+// summoner spell book
+App.SummonerSpellBookComponent = Ember.Component.extend({
+    classNames: ['summoner-spell-book']
+});
+
+// summoner name
+App.SummonerNameComponent = Ember.Component.extend({
+    classNames: ['summoner-name']
+});
+
+// summoner stats
+App.SummonerStatsComponent = Ember.Component.extend({
+    classNames: ['summoner-stats'],
     activatePopovers: function() {
         this.$('.stat-minions').popover({
             trigger: 'hover',
@@ -57,6 +73,16 @@ App.PlayerInfoComponent = Ember.Component.extend({
                 '</div>'
         });
     }.on('didInsertElement')
+});
+
+// summoner items
+App.SummonerItemsComponent = Ember.Component.extend({
+    classNames: ['summoner-items']
+});
+
+// summoner item
+App.SummonerItemComponent = Ember.Component.extend({
+    classNames: ['summoner-item']
 });
 
 // league decorator
@@ -88,6 +114,26 @@ App.LeagueDecoratorComponent = Ember.Component.extend({
         this.set('offset_class', offset_class);
         this.set('offset', offset);
     }.on('willInsertElement')
+});
+
+// toggle match stats view
+App.ToggleMatchStatsView = Ember.View.extend({
+    click: function(e) {
+        if(e.target.tagName == 'A') {
+            return true;
+        }
+        else {
+            var match = this.get('match');
+            if(match.get('stats')) {
+                if(match.get('stats_showing')) {
+                    match.set('stats_showing', false);
+                }
+                else {
+                    match.set('stats_showing', true);
+                }
+            }
+        }
+    }
 });
 
 // summoner search

@@ -74,6 +74,7 @@ def find_match_ids(region, summoner, begin_index, end_index):
     database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
 
     logger.warning('[find_match_ids] begin_index {}'.format(begin_index))
+    logger.warning('[find_match_ids] end_index {}'.format(end_index))
     logger.warning('[find_match_ids] summoner {}'.format(summoner))
 
     # if loading the first page and a refresh is possible, pull new data from the api
@@ -81,7 +82,7 @@ def find_match_ids(region, summoner, begin_index, end_index):
         logger.warning('[find_match_ids] getting api matches 1')
         api_pull_match_history(region, summoner, begin_index)
 
-        # set the refresh datetime if we are fetching from the start
+        # update the last refresh datetime since we just refreshed
         sql = u"""
             UPDATE
                 summoners
@@ -94,7 +95,6 @@ def find_match_ids(region, summoner, begin_index, end_index):
             database.escape(region),
             summoner['id'],
         )
-        logger.warning('[find_match_ids] eh, wtf? {}'.format(sql))
         database.execute(sql)
 
     # try getting match ids
@@ -102,7 +102,7 @@ def find_match_ids(region, summoner, begin_index, end_index):
     logger.warning('[find_match_ids] db_get_match_ids FIRST TRY got {}'.format(match_ids))
 
     # if not the first page and no matches were found, try pulling new ones from the api
-    if begin_index > 0 and not match_ids:
+    if (begin_index > 0 and not match_ids) or len(match_ids) < MATCHES_PER_PAGE:
         logger.warning('[find_match_ids] getting api matches 2')
         api_pull_match_history(region, summoner, begin_index)
         match_ids = db_get_match_ids(region, summoner, begin_index, end_index)
@@ -430,7 +430,7 @@ def api_pull_match_history(region, summoner, begin_index):
                     AND match_region = {}
                     AND match_id IN ({})
                 """.format(
-                    database.escape(summoner['id']),
+                    summoner['id'],
                     database.escape(region),
                     ','.join(str(match['matchId']) for match in matches),
                 )
@@ -440,9 +440,11 @@ def api_pull_match_history(region, summoner, begin_index):
 
             match_stats = []
             for match in matches:
-                logger.warning('[api_pull_match_history] looking at match {}'.format(match['matchId']))
                 # if the match is not already recorded and in this season, then record it
-                if match['matchId'] not in recorded_match_ids and match['season'] == SEASON_NAME:
+                # if match['matchId'] not in recorded_match_ids and match['season'] == SEASON_NAME:
+                #TODO: add back in the "recorded match ids" check after a little while, had to disable so that items could be stored
+                if match['season'] == SEASON_NAME:
+                    logger.warning('[api_pull_match_history] getting stats for match {}'.format(match['matchId']))
                     match_stats.append(match_helper.get_stats(match, detailed=False))
 
             if match_stats:
@@ -461,7 +463,7 @@ def api_pull_match_history(region, summoner, begin_index):
                         pass
 
 
-def api_pull_match(match_id):
+def api_pull_match(match_id, region):
     database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
 
     # see if this match has already been recorded
@@ -473,7 +475,7 @@ def api_pull_match(match_id):
         WHERE 1
             AND match_region = {}
             AND match_id = {}
-            AND details_loaded = 1
+            AND details_pulled = 1
         """.format(
             database.escape(region),
             match_id,
@@ -493,8 +495,8 @@ def api_pull_match(match_id):
                 logger.warning('doing player_helper.get_stats()')
                 player_stats = player_helper.get_stats(match_stats, database)
 
-                logger.warning('inserting player {}'.format(summoner['id']))
-                player_helper.insert(player_stats, database, summoner['id'])
+                logger.warning('inserting player stats')
+                player_helper.insert(player_stats, database)
 
                 for match_stat in match_stats:
                     try:
@@ -536,26 +538,42 @@ class Matches(restful.Resource):
         sql = u"""
             SELECT
                 m.*,
-                c.image_icon_url as champion_image_icon_url,
-                ss1.image_icon_url as summoner_spell_1_icon_url,
-                ss2.image_icon_url as summoner_spell_2_icon_url,
+                c.image_icon_url as summoner_champion_image_icon_url,
+                ss1.image_icon_url as summoner_spell_1_image_icon_url,
+                ss2.image_icon_url as summoner_spell_2_image_icon_url,
+                i0.image_icon_url as summoner_item_0_image_icon_url,
+                i1.image_icon_url as summoner_item_1_image_icon_url,
+                i2.image_icon_url as summoner_item_2_image_icon_url,
+                i3.image_icon_url as summoner_item_3_image_icon_url,
+                i4.image_icon_url as summoner_item_4_image_icon_url,
+                i5.image_icon_url as summoner_item_5_image_icon_url,
+                i6.image_icon_url as summoner_item_6_image_icon_url,
                 s.name as summoner_name
             FROM
                 matches m
             LEFT JOIN champions c ON c.id = m.summoner_champion_id
             LEFT JOIN summoner_spells ss1 ON ss1.id = m.summoner_spell_1_id
             LEFT JOIN summoner_spells ss2 ON ss2.id = m.summoner_spell_2_id
+            LEFT JOIN items i0 ON i0.id = m.summoner_item_0_id
+            LEFT JOIN items i1 ON i1.id = m.summoner_item_1_id
+            LEFT JOIN items i2 ON i2.id = m.summoner_item_2_id
+            LEFT JOIN items i3 ON i3.id = m.summoner_item_3_id
+            LEFT JOIN items i4 ON i4.id = m.summoner_item_4_id
+            LEFT JOIN items i5 ON i5.id = m.summoner_item_5_id
+            LEFT JOIN items i6 ON i6.id = m.summoner_item_6_id
             LEFT JOIN summoners s ON m.summoner_id = s.id AND m.match_region = s.region
             WHERE 1
-                AND match_region = {}
-                AND summoner_id = {}
+                AND m.match_region = {}
+                AND m.summoner_id = {}
+            GROUP BY
+                m.match_id
             ORDER BY
                 m.match_create_datetime DESC
             LIMIT {}
             OFFSET {}
         """.format(
             database.escape(region),
-            database.escape(summoner['id']),
+            summoner['id'],
             (end_index - begin_index),
             begin_index,
         )
@@ -569,6 +587,7 @@ class Matches(restful.Resource):
         for row in rows:
             match = {
                 'id': '{}-{}-{}'.format(region, summoner['id'], row['match_id']),
+                'match_id': row['match_id'],
                 'create_datetime': row['match_create_datetime'].isoformat(),
                 'match_total_time_in_minutes': row['match_total_time_in_minutes'],
                 'player': {
@@ -579,10 +598,17 @@ class Matches(restful.Resource):
                     'summoner_cs': row['summoner_minions_killed'] + row['summoner_neutral_minions_killed_team_jungle'] + row['summoner_neutral_minions_killed_enemy_jungle'],
                     'summoner_minions_killed': row['summoner_minions_killed'],
                     'summoner_neutral_minions_killed': row['summoner_neutral_minions_killed_team_jungle'] + row['summoner_neutral_minions_killed_enemy_jungle'],
-                    'summoner_spell_1_icon_url': row['summoner_spell_1_icon_url'],
-                    'summoner_spell_2_icon_url': row['summoner_spell_2_icon_url'],
+                    'summoner_spell_1_icon_url': row['summoner_spell_1_image_icon_url'],
+                    'summoner_spell_2_icon_url': row['summoner_spell_2_image_icon_url'],
+                    'summoner_item_0_icon_url': row['summoner_item_0_image_icon_url'],
+                    'summoner_item_1_icon_url': row['summoner_item_1_image_icon_url'],
+                    'summoner_item_2_icon_url': row['summoner_item_2_image_icon_url'],
+                    'summoner_item_3_icon_url': row['summoner_item_3_image_icon_url'],
+                    'summoner_item_4_icon_url': row['summoner_item_4_image_icon_url'],
+                    'summoner_item_5_icon_url': row['summoner_item_5_image_icon_url'],
+                    'summoner_item_6_icon_url': row['summoner_item_6_image_icon_url'],
                     'summoner_champion': {
-                        'image_icon_url': row['champion_image_icon_url'],
+                        'image_icon_url': row['summoner_champion_image_icon_url'],
                         'level': row['summoner_champion_level'],
                     },
                     'summoner_is_winner': row['summoner_is_winner'],
@@ -608,21 +634,21 @@ class Matches(restful.Resource):
 
 
 # retrieve the stats for a specific match
-class Stats(restful.Resource):
-    def get(self):
-        database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
-
+class MatchStats(restful.Resource):
+    def get(self, match_id):
         # process args
-        parser.add_argument('match_id', type=int, required=True)
         parser.add_argument('region', type=str_trimmed, required=True)
         parser.add_argument('summoner_name', type=str_trimmed, required=True)
         args = parser.parse_args()
-        match_id = args['match_id']
-        region = args['region']
+        region = args['region'].lower()
         summoner_name = args['summoner_name']
 
         summoner = get_summoner(region, summoner_name)
 
+        # make sure the stats are in our database
+        api_pull_match(match_id, region)
+
+        # get the stats
         match_stats = db_get_match_stats(match_id, region, summoner)
 
         return {
@@ -631,4 +657,4 @@ class Stats(restful.Resource):
 
 
 api.add_resource(Matches, '/1.0/matches')
-api.add_resource(Stats, '/1.0/stats')
+api.add_resource(MatchStats, '/1.0/matches/<int:match_id>/stats')

@@ -1,7 +1,7 @@
 App.Match = DS.Model.extend({
+    create_datetime: DS.attr(),
     match_total_time_in_minutes: DS.attr(),
     player: DS.attr(),
-    create_datetime: DS.attr(),
     stats: DS.attr(),
     stats_showing: DS.attr()
 });
@@ -11,13 +11,20 @@ App.MatchesController = Ember.ArrayController.extend({
     actions: {
         show_more: function() {
             this.fetch_more_matches();
-        },
-        show_stats: function(match) {
-            match.set('stats_showing', true);
-        },
-        hide_stats: function(match) {
-            match.set('stats_showing', false);
         }
+    },
+    fetch_match_stats: function(match) {
+        var region = this.get('region'),
+            summoner_name = this.get('summoner_name');
+
+        match.set('loading_stats', true);
+
+        jQuery.getJSON('/api/1.0/matches/'+match.get('match_id')+'/stats?region='+region+'&summoner_name='+summoner_name).done(function(resp) {
+            match.set('stats', resp.stats);
+            match.set('loading_stats', false);
+        }).fail(function(resp) {
+            match.set('loading_stats', false);
+        });
     },
     fetch_more_matches: function() {
         var self = this,
@@ -35,13 +42,27 @@ App.MatchesController = Ember.ArrayController.extend({
 
         return jQuery.getJSON('/api/1.0/matches?region='+region+'&summoner_name='+summoner_name+'&page='+page).done(function(resp) {
             var new_matches = [];
+            var matches_needing_stats = [];
             for(var i=0, n=resp.matches.length; i<n; ++i) {
-                new_matches.push(self.store.createRecord('match', resp.matches[i]));
+                var new_match = self.store.createRecord('match', resp.matches[i]);
+
+                // record which matches to pull stats for
+                if(!new_match.get('stats')) {
+                    matches_needing_stats.push(new_match);
+                }
+
+                new_matches.push(new_match);
             }
+
             var matches = self.get('matches');
             self.set('matches', matches.concat(new_matches));
             self.set('loading', false);
             self.set('loading_more', false);
+
+            // get stats for matches that need them
+            for(var i=0, n=matches_needing_stats.length; i<n; ++i) {
+                self.fetch_match_stats(matches_needing_stats[i]);
+            }
         }).fail(function(resp) {
             // show error
             if(isset(resp, 'responseJSON', 'error_key')) {

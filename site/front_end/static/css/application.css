@@ -86,6 +86,9 @@ table.table-stats {
   background: #fff;
   margin-bottom: 0;
 }
+table.table-stats tr:first-child td {
+  border-top: 0;
+}
 table.table-stats tr.header td.team-blue,
 table.table-stats tr.header td.team-red {
   position: relative;
@@ -225,43 +228,50 @@ tr.row-0 .league-decorator .league-offset,
 .current-player .league-decorator .league-offset {
   display: block;
 }
-.summoner-info {
+.summoner-champion {
   position: relative;
-  margin: 0 auto;
-  width: 64px;
-}
-.summoner-info:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.summoner-info .summoner-champion-icon {
   width: 42px;
-  float: left;
 }
-.summoner-info .summoner-champion-level {
+.summoner-champion .summoner-champion-icon {
+  width: 42px;
+}
+.summoner-champion .summoner-champion-level {
   position: absolute;
-  bottom: 3px;
-  left: 4px;
+  bottom: 1px;
+  left: 2px;
   color: #fff;
   font-weight: bold;
   text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
   font-size: 12px;
   line-height: 12px;
 }
-.summoner-info .summoner-spell-book {
-  float: left;
+.summoner-spell-book {
   width: 20px;
   height: 42px;
-  margin-left: 2px;
 }
-.summoner-info .summoner-spell-book .summoner-spell-icon {
+.summoner-spell-book .summoner-spell-icon {
   display: block;
   margin-top: 2px;
   width: 20px;
 }
-.summoner-info .summoner-spell-book .summoner-spell-icon:first-child {
+.summoner-spell-book .summoner-spell-icon:first-child {
   margin-top: 0;
+}
+.summoner-champion-spell-group {
+  margin: 0 auto;
+  width: 64px;
+}
+.summoner-champion-spell-group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.summoner-champion-spell-group .summoner-champion {
+  float: left;
+}
+.summoner-champion-spell-group .summoner-spell-book {
+  float: left;
+  margin-left: 2px;
 }
 .stat-score,
 .stat-minions {
@@ -300,24 +310,30 @@ tr.row-0 .league-decorator .league-offset,
 .popover-nowrap {
   white-space: nowrap;
 }
+.match-stats .summoner-name {
+  margin-top: 2px;
+}
 .match {
   background: #fff;
-  border: 1px solid #ccc;
   margin-top: 5px;
 }
 .match:first-child {
   margin-top: 0;
 }
 .match .match-summary {
+  cursor: pointer;
+}
+.match .match-summary > div {
   display: table;
   width: 100%;
-  position: relative;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   padding: 10px;
 }
-.match .match-summary:after {
-  content: "";
-  display: table;
-  clear: both;
+.match .match-summary > div:hover {
+  background: #eee;
+  border-color: #aaa;
 }
 .match .match-summary.victory {
   border-left: 10px solid #63c063;
@@ -325,103 +341,129 @@ tr.row-0 .league-decorator .league-offset,
 .match .match-summary.defeat {
   border-left: 10px solid #a63935;
 }
-.match .match-summary .summoner-info-container {
+.match .match-summary .match-summary-section {
   display: table-cell;
   vertical-align: middle;
-  width: 200px;
+  text-align: left;
 }
-.match .match-summary .summoner-info-container .summoner-info {
-  float: left;
-  width: 91px;
-}
-.match .match-summary .summoner-info-container .summoner-info .summoner-champion-icon {
+.match .match-summary .summoner-champion-container {
   width: 60px;
 }
-.match .match-summary .summoner-info-container .summoner-info .summoner-champion-level {
+.match .match-summary .summoner-champion-container .summoner-champion {
+  display: table-cell;
+  vertical-align: middle;
+  width: 91px;
+}
+.match .match-summary .summoner-champion-container .summoner-champion .summoner-champion-icon {
+  width: 60px;
+}
+.match .match-summary .summoner-champion-container .summoner-champion .summoner-champion-level {
   font-size: 14px;
   line-height: 14px;
+  bottom: 2px;
+  left: 3px;
 }
-.match .match-summary .summoner-info-container .summoner-info .summoner-spell-book {
+.match .match-summary .summoner-spell-book-container {
+  width: 29px;
+  padding-left: 2px;
+}
+.match .match-summary .summoner-spell-book-container .summoner-spell-book {
+  display: table-cell;
+  vertical-align: middle;
   width: 29px;
   height: 60px;
 }
-.match .match-summary .summoner-info-container .summoner-info .summoner-spell-book .summoner-spell-icon {
+.match .match-summary .summoner-spell-book-container .summoner-spell-book .summoner-spell-icon {
   width: 29px;
 }
-.match .match-summary .summoner-info-container .summoner-name {
+.match .match-summary .summoner-spell-book-container .summoner-name {
   display: none;
 }
-.match .match-summary .summoner-info-container .stat-container {
-  float: left;
+.match .match-summary .summoner-stats-container {
+  padding-left: 10px;
+  width: 120px;
+}
+.match .match-summary .summoner-stats-container .summoner-stats {
+  display: table-cell;
+  vertical-align: middle;
   margin-left: 10px;
   padding-top: 9px;
   text-align: left;
 }
-.match .match-summary .summoner-info-container .stat-container .stat-score .icon,
-.match .match-summary .summoner-info-container .stat-container .stat-minions .icon {
+.match .match-summary .summoner-stats-container .summoner-stats .stat-score .icon,
+.match .match-summary .summoner-stats-container .summoner-stats .stat-minions .icon {
   width: 18px;
   height: 21px;
   background-size: 30px 30px;
 }
-.match .match-summary .summoner-info-container .stat-container .stat-score .value,
-.match .match-summary .summoner-info-container .stat-container .stat-minions .value {
+.match .match-summary .summoner-stats-container .summoner-stats .stat-score .value,
+.match .match-summary .summoner-stats-container .summoner-stats .stat-minions .value {
   font-size: 15px;
   line-height: 15px;
 }
-.match .match-summary .overall-league-decorator {
+.match .match-summary .summoner-items-container {
+  width: 271px;
+}
+.match .match-summary .summoner-items-container .summoner-items {
   display: table-cell;
   vertical-align: middle;
-  padding-left: 10px;
   text-align: left;
+  padding-left: 20px;
 }
-.match .match-summary .overall-league-decorator .league-decorator .league-icon {
+.match .match-summary .summoner-items-container .summoner-items .summoner-item {
+  float: left;
+  margin-left: 1px;
+  vertical-align: middle;
+}
+.match .match-summary .summoner-items-container .summoner-items .summoner-item:first-child {
+  margin-left: 0;
+}
+.match .match-summary .summoner-items-container .summoner-items .summoner-item img {
+  width: 35px;
+  height: 35px;
+}
+.match .match-summary .summoner-items-container .summoner-items .summoner-item .empty-slot {
+  width: 35px;
+  height: 35px;
+  background: rgba(0, 0, 0, 0.1);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.5);
+}
+.match .match-summary .league-decorator-container {
+  text-align: left;
+  padding-left: 20px;
+}
+.match .match-summary .league-decorator-container .league-decorator .league-icon {
   height: 40px;
 }
-.match .match-summary .overall-league-decorator .league-decorator .league-offset {
+.match .match-summary .league-decorator-container .league-decorator .league-offset {
   display: block;
   margin-left: 52px;
 }
-.match .match-summary .overall-league-decorator .league-decorator .league-offset .league-offset-icon {
+.match .match-summary .league-decorator-container .league-decorator .league-offset .league-offset-icon {
   font-size: 16px;
   margin-left: -3px;
 }
-.match .match-summary .overall-league-decorator .league-decorator .league-offset.played-up .league-offset-icon {
+.match .match-summary .league-decorator-container .league-decorator .league-offset.played-up .league-offset-icon {
   top: -10px;
 }
-.match .match-summary .overall-league-decorator .league-decorator .league-offset.played-down .league-offset-icon {
+.match .match-summary .league-decorator-container .league-decorator .league-offset.played-down .league-offset-icon {
   bottom: -10px;
 }
-.match .match-summary .overall-league-decorator .league-decorator .league-offset .league-offset-value {
+.match .match-summary .league-decorator-container .league-decorator .league-offset .league-offset-value {
   font-size: 18px;
 }
-.match .match-summary .items {
-  display: table-cell;
-  vertical-align: middle;
-  padding-left: 20px;
-}
-.match .match-summary .stats-button {
-  display: table-cell;
-  vertical-align: middle;
+.match .match-summary .match-info-container {
   text-align: right;
   white-space: nowrap;
   width: 1px;
   padding-left: 20px;
 }
-.match .match-summary .match-time {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: right;
-  white-space: nowrap;
-  width: 1px;
-  padding-left: 20px;
-}
-.match .match-summary .match-history {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: right;
-  white-space: nowrap;
-  width: 1px;
-  padding-left: 20px;
+.match .match-stats {
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
 .show-more-container {
   margin-top: 10px;
