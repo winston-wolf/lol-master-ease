@@ -517,7 +517,7 @@ class Matches(restful.Resource):
         parser.add_argument('page', type=int)
         args = parser.parse_args()
         region = args['region'].lower()
-        summoner_name = args['summoner_name']
+        summoner_name = args['summoner_name'].replace(' ', '')
         page = args['page']
         if not page:
             page = 1
@@ -641,7 +641,7 @@ class MatchStats(restful.Resource):
         parser.add_argument('summoner_name', type=str_trimmed, required=True)
         args = parser.parse_args()
         region = args['region'].lower()
-        summoner_name = args['summoner_name']
+        summoner_name = args['summoner_name'].replace(' ', '')
 
         summoner = get_summoner(region, summoner_name)
 
