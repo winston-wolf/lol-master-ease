@@ -65,13 +65,10 @@ def request(url, region, type='GET', retry_count=0, **kwargs):
     elif response.status == 404:
         return None
     elif response.status == 429:
-        logging.info('Rate limit exceeded, waiting 20 seconds...')
+        logger.info('Rate limit exceeded, waiting 20 seconds...')
         sleep(20)
         return request(url, region, type, retry_count+1, **kwargs)
     elif retry_count >= 3:
         raise Exception("Maximum retries exceeded")
     else:
-        logging.warning('ELSE HAPPENED!!!!!!!!! -- Response Status: {} FOR {}'.format(response.status, url.format(region=region,apiKey=API_KEY,**kwargs)))
-        logging.warning('ELSE HAPPENED!!!!!!!!! -- Response Data: {}'.format(response.data))
-        return None
         return request(url, region, type, retry_count+1, **kwargs)
