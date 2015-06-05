@@ -299,182 +299,119 @@ def insert(match_stats, player_stats, database, detailed=False):
     # Match Insertion
     # ---------------------------------------------------- #
 
+    valid_summoner_insertion_data_keys = [
+        'summoner_id',
+        'summoner_rank_tier',
+        'summoner_rank_division',
+        'summoner_role',
+        'summoner_lane',
+        'summoner_champion_id',
+        'summoner_champion_level',
+        'summoner_spell_1_id',
+        'summoner_spell_2_id',
+        'summoner_item_0_id',
+        'summoner_item_1_id',
+        'summoner_item_2_id',
+        'summoner_item_3_id',
+        'summoner_item_4_id',
+        'summoner_item_5_id',
+        'summoner_item_6_id',
+        'summoner_is_winner',
+        'summoner_team_id',
+        'summoner_kills_total',
+        'summoner_kills_double',
+        'summoner_kills_triple',
+        'summoner_kills_quadra',
+        'summoner_kills_penta',
+        'summoner_killing_sprees',
+        'summoner_deaths',
+        'summoner_assists',
+        'summoner_inhibitor_kills',
+        'summoner_tower_kills',
+        'summoner_tower_kills_in_lane',
+        'summoner_sight_wards_purchased',
+        'summoner_sight_wards_placed',
+        'summoner_sight_wards_killed',
+        'summoner_vision_wards_purchased',
+        'summoner_vision_wards_placed',
+        'summoner_vision_wards_killed',
+        'summoner_damage_done_to_champions',
+        'summoner_damage_taken',
+        'summoner_xp_earned',
+        'summoner_minions_killed',
+        'summoner_neutral_minions_killed_enemy_jungle',
+        'summoner_neutral_minions_killed_team_jungle',
+        'summoner_healing_done_total',
+        'summoner_gold_spent',
+        'summoner_gold_earned',
+        'summoner_crowd_control_time_dealt_in_seconds',
+        'summoner_trinket_upgraded',
+    ]
+    valid_team_insertion_data_keys = [
+        'team_first_dragon_kill_time_in_minutes',
+        'team_killed_first_dragon',
+        'team_killed_first_baron',
+        'team_killed_first_tower',
+        'team_killed_first_inhibitor',
+        'team_killed_first_champion',
+        'team_dragon_kills',
+        'team_baron_kills',
+        'team_sight_wards_placed',
+        'team_vision_wards_placed',
+    ]
+
     insertion_data = []
     for player in match_stats['players']:
-
-        insertion_arguments = {}
+        data = {}
         for stat, value in player.items():
-            insertion_arguments['summoner_' + stat] = database.escape(value)
+            key = 'summoner_' + stat
+            if key in valid_summoner_insertion_data_keys:
+                data[key] = database.escape(value)
 
         if detailed:
             for stat, value in match_stats['teams'][player['team_id']].items():
-                insertion_arguments['team_' + stat] = database.escape(value)
+                key = 'team_' + stat
+                if key in valid_team_insertion_data_keys:
+                    data[key] = database.escape(value)
 
         _player_stats = player_stats[player['id']]
-        insertion_arguments['summoner_rank_tier'] = database.escape(_player_stats['rank_tier'])
-        insertion_arguments['summoner_rank_division'] = database.escape(_player_stats['rank_division'])
+        if 'summoner_rank_tier' in valid_summoner_insertion_data_keys:
+            data['summoner_rank_tier'] = database.escape(_player_stats['rank_tier'])
+        if 'summoner_rank_division' in valid_summoner_insertion_data_keys:
+            data['summoner_rank_division'] = database.escape(_player_stats['rank_division'])
 
-        insertion_string = u"""
-        (
-            {details_pulled},
-            {match_id},
-            {match_region},
-            {summoner_id},
-            {summoner_rank_tier},
-            {summoner_rank_division},
-            {match_season},
-            {match_queue_type},
-            {match_create_datetime},
-            {match_total_time_in_minutes},
-            {summoner_role},
-            {summoner_lane},
-            {summoner_champion_id},
-            {summoner_champion_level},
-            {summoner_spell_1_id},
-            {summoner_spell_2_id},
-            {summoner_item_0_id},
-            {summoner_item_1_id},
-            {summoner_item_2_id},
-            {summoner_item_3_id},
-            {summoner_item_4_id},
-            {summoner_item_5_id},
-            {summoner_item_6_id},
-            {summoner_is_winner},
-            {summoner_team_id},
-            {summoner_kills_total},
-            {summoner_kills_double},
-            {summoner_kills_triple},
-            {summoner_kills_quadra},
-            {summoner_kills_penta},
-            {summoner_killing_sprees},
-            {summoner_deaths},
-            {summoner_assists},"""
         if detailed:
-            insertion_string += u"""
-                {team_first_dragon_kill_time_in_minutes},
-                {team_killed_first_dragon},
-                {team_killed_first_baron},
-                {team_killed_first_tower},
-                {team_killed_first_inhibitor},
-                {team_killed_first_champion},
-                {team_dragon_kills},
-                {team_baron_kills},
-                {team_sight_wards_placed},
-                {team_vision_wards_placed},"""
-        insertion_string += u"""
-            {summoner_inhibitor_kills},
-            {summoner_tower_kills},
-            {summoner_tower_kills_in_lane},
-            {summoner_sight_wards_purchased},
-            {summoner_sight_wards_placed},
-            {summoner_sight_wards_killed},
-            {summoner_vision_wards_purchased},
-            {summoner_vision_wards_placed},
-            {summoner_vision_wards_killed},
-            {summoner_damage_done_to_champions},
-            {summoner_damage_taken},
-            {summoner_xp_earned},
-            {summoner_minions_killed},
-            {summoner_neutral_minions_killed_enemy_jungle},
-            {summoner_neutral_minions_killed_team_jungle},
-            {summoner_healing_done_total},
-            {summoner_gold_spent},
-            {summoner_gold_earned},
-            {summoner_crowd_control_time_dealt_in_seconds},
-            {summoner_trinket_upgraded}
-        )
-        """
+            data['details_pulled'] = detailed
 
-        insertion_string = insertion_string.format(
-            details_pulled=detailed,
-            match_id=match_id,
-            match_region=match_region,
-            match_season=database.escape(match['season']),
-            match_queue_type=database.escape(match['queue_type']),
-            match_total_time_in_minutes=match['total_time_in_minutes'],
-            match_create_datetime=database.escape(match['create_datetime']),
-            **insertion_arguments
+        data['match_id'] = match_id
+        data['match_region'] = match_region
+        data['match_season'] = database.escape(match['season'])
+        data['match_queue_type'] = database.escape(match['queue_type'])
+        data['match_total_time_in_minutes'] = match['total_time_in_minutes']
+        data['match_create_datetime'] = database.escape(match['create_datetime'])
+
+        insertion_data.append(data)
+
+    if insertion_data:
+        field_list = [u'`{}`'.format(key) for key in insertion_data[0].keys()]
+
+        values_list = []
+        for data in insertion_data:
+            values_list.append(u'(' + u','.join([u'{}'.format(value) for value in data.values()]) + u')')
+
+        sql = u"""
+            INSERT INTO
+                `matches` ({})
+            VALUES {}
+            ON DUPLICATE KEY UPDATE
+                {}
+        """.format(
+            u','.join(field_list),
+            u','.join(values_list),
+            u','.join([u'{0} = VALUES({0})'.format(field) for field in field_list]),
         )
 
-        insertion_data.append(insertion_string)
-
-    insert_query = u"""
-    REPLACE INTO
-        `matches`
-        (
-            `details_pulled`,
-            `match_id`,
-            `match_region`,
-            `summoner_id`,
-            `summoner_rank_tier`,
-            `summoner_rank_division`,
-            `match_season`,
-            `match_queue_type`,
-            `match_create_datetime`,
-            `match_total_time_in_minutes`,
-            `summoner_role`,
-            `summoner_lane`,
-            `summoner_champion_id`,
-            `summoner_champion_level`,
-            `summoner_spell_1_id`,
-            `summoner_spell_2_id`,
-            `summoner_item_0_id`,
-            `summoner_item_1_id`,
-            `summoner_item_2_id`,
-            `summoner_item_3_id`,
-            `summoner_item_4_id`,
-            `summoner_item_5_id`,
-            `summoner_item_6_id`,
-            `summoner_is_winner`,
-            `summoner_team_id`,
-            `summoner_kills_total`,
-            `summoner_kills_double`,
-            `summoner_kills_triple`,
-            `summoner_kills_quadra`,
-            `summoner_kills_penta`,
-            `summoner_killing_sprees`,
-            `summoner_deaths`,
-            `summoner_assists`,"""
-    if detailed:
-        insert_query += u"""
-            `team_first_dragon_kill_time_in_minutes`,
-            `team_killed_first_dragon`,
-            `team_killed_first_baron`,
-            `team_killed_first_tower`,
-            `team_killed_first_inhibitor`,
-            `team_killed_first_champion`,
-            `team_dragon_kills`,
-            `team_baron_kills`,
-            `team_sight_wards_placed`,
-            `team_vision_wards_placed`,"""
-    insert_query += u"""
-            `summoner_inhibitor_kills`,
-            `summoner_tower_kills`,
-            `summoner_tower_kills_in_lane`,
-            `summoner_sight_wards_purchased`,
-            `summoner_sight_wards_placed`,
-            `summoner_sight_wards_killed`,
-            `summoner_vision_wards_purchased`,
-            `summoner_vision_wards_placed`,
-            `summoner_vision_wards_killed`,
-            `summoner_damage_done_to_champions`,
-            `summoner_damage_taken`,
-            `summoner_xp_earned`,
-            `summoner_minions_killed`,
-            `summoner_neutral_minions_killed_enemy_jungle`,
-            `summoner_neutral_minions_killed_team_jungle`,
-            `summoner_healing_done_total`,
-            `summoner_gold_spent`,
-            `summoner_gold_earned`,
-            `summoner_crowd_control_time_dealt_in_seconds`,
-            `summoner_trinket_upgraded`
-        )
-        VALUES {};
-    """
-
-    insert_query = insert_query.format(u",".join(insertion_data))
-
-    database.execute(insert_query)
+        database.execute(sql)
 
     if detailed:
         # ---------------------------------------------------- #

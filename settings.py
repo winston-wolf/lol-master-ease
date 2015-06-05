@@ -44,7 +44,7 @@ MATCH_DELTA_TIMES = {
     'thirtyToEnd': [30, None]
 }
 SEASON_NAME = 'SEASON2015'
-MATCHES_PER_PAGE = 10
+MATCHES_PER_PAGE = 15
 
 # allow local settings override
 try:

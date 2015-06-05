@@ -19,6 +19,11 @@ parser = reqparse.RequestParser()
 import logging
 logger = logging.getLogger('freelo')
 
+RANK_MAX = len(RANK_TIERS) - 1
+RANK_ID_TO_NAME = {_id: name for _id, name in enumerate(RANK_TIERS)}
+RANK_NAME_TO_ID = {name: _id for _id, name in RANK_ID_TO_NAME.items()}
+
+
 # returns a trimmed string value as an argument type
 def str_trimmed(value):
     return value.strip()
@@ -137,6 +142,25 @@ def db_get_match_ids(region, summoner, begin_index, end_index):
     logger.warning('[db_get_match_ids] SQL: {}'.format(sql))
 
     return database.fetch_all_value(sql)
+
+
+# provided an offset, gives the difference in rank id, name, and offset
+def get_diffed_rank(rank_id, offset):
+    if offset is None:
+        return {'id': -1, 'name': 'unranked', 'offset': 0}
+
+    diffed_rank = rank_id + int(offset)
+
+    if diffed_rank > RANK_MAX:
+        rank_name = 'CHALLENGER'
+        diffed_rank = RANK_MAX
+    elif diffed_rank < 1:
+        rank_name = 'BRONZE'
+        diffed_rank = 0
+    else:
+        rank_name = RANK_ID_TO_NAME[diffed_rank]
+
+    return {'id': diffed_rank, 'name': rank_name, 'offset': int(offset)}
 
 
 def db_get_match_stats(match_id, region, summoner):
@@ -331,10 +355,6 @@ def db_get_match_stats(match_id, region, summoner):
     # Build Stats
     # ---------------------------------------------------- #
 
-    RANK_MAX = len(RANK_TIERS) - 1
-    RANK_ID_TO_NAME = {_id: name for _id, name in enumerate(RANK_TIERS)}
-    RANK_NAME_TO_ID = {name: _id for _id, name in RANK_ID_TO_NAME.items()}
-
     stats_players = match_stats['players']
     stats_key_factors = {_factor['id']: _factor for _factor in match_stats['key_factors']}
 
@@ -372,33 +392,17 @@ def db_get_match_stats(match_id, region, summoner):
         })
 
         rank_id = player_game['summoner_rank_tier_id'] or average_rank
-        def get_diffed_rank(offset):
-            if offset is None:
-                return {'id': -1, 'name': 'unranked', 'offset': 0}
 
-            diffed_rank = rank_id + int(offset)
-
-            if diffed_rank > RANK_MAX:
-                rank_name = 'GOD'
-                diffed_rank = RANK_MAX
-            elif diffed_rank < 1:
-                rank_name = 'WOOD'
-                diffed_rank = 0
-            else:
-                rank_name = RANK_ID_TO_NAME[diffed_rank]
-
-            return {'id': diffed_rank, 'name': rank_name, 'offset': int(offset)}
-
-        stats_key_factors['overall']['totals'].append(get_diffed_rank(player_game['overall']))
-        stats_key_factors['cs']['totals'].append(get_diffed_rank(player_game['tier_diff_cs']))
-        stats_key_factors['wards_vision']['totals'].append(get_diffed_rank(player_game['tier_diff_vision_wards_placed']))
-        stats_key_factors['wards_sight']['totals'].append(get_diffed_rank(player_game['tier_diff_sight_wards_placed']))
-        stats_key_factors['assists']['totals'].append(get_diffed_rank(player_game['tier_diff_assists']))
-        stats_key_factors['deaths']['totals'].append(get_diffed_rank(player_game['tier_diff_deaths']))
-        stats_key_factors['kills']['totals'].append(get_diffed_rank(player_game['tier_diff_kills']))
-        stats_key_factors['first_dragon']['totals'].append(get_diffed_rank(player_game['tier_diff_team_first_dragon_kill_time_in_minutes']))
-        stats_key_factors['match_time']['totals'].append(get_diffed_rank(player_game['tier_diff_match_time_in_minutes']))
-        stats_key_factors['damage_done_to_champions']['totals'].append(get_diffed_rank(player_game['tier_diff_damage_done_to_champions']))
+        stats_key_factors['overall']['totals'].append(get_diffed_rank(rank_id, player_game['overall']))
+        stats_key_factors['cs']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_cs']))
+        stats_key_factors['wards_vision']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_vision_wards_placed']))
+        stats_key_factors['wards_sight']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_sight_wards_placed']))
+        stats_key_factors['assists']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_assists']))
+        stats_key_factors['deaths']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_deaths']))
+        stats_key_factors['kills']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_kills']))
+        stats_key_factors['first_dragon']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_team_first_dragon_kill_time_in_minutes']))
+        stats_key_factors['match_time']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_match_time_in_minutes']))
+        stats_key_factors['damage_done_to_champions']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_damage_done_to_champions']))
 
     return match_stats
 
@@ -441,9 +445,7 @@ def api_pull_match_history(region, summoner, begin_index):
             match_stats = []
             for match in matches:
                 # if the match is not already recorded and in this season, then record it
-                # if match['matchId'] not in recorded_match_ids and match['season'] == SEASON_NAME:
-                #TODO: add back in the "recorded match ids" check after a little while, had to disable so that items could be stored
-                if match['season'] == SEASON_NAME:
+                if match['matchId'] not in recorded_match_ids and match['season'] == SEASON_NAME:
                     logger.warning('[api_pull_match_history] getting stats for match {}'.format(match['matchId']))
                     match_stats.append(match_helper.get_stats(match, detailed=False))
 
@@ -480,6 +482,7 @@ def api_pull_match(match_id, region):
             database.escape(region),
             match_id,
         )
+    logger.warning('[api_pull_match] sql: {}'.format(sql))
     recorded_match_ids = database.fetch_all_value(sql)
 
     # don't record the match if it has already been recorded
@@ -656,5 +659,151 @@ class MatchStats(restful.Resource):
         }
 
 
+def db_get_matches_stats(region, summoner):
+    # need at least 10 games to see aggregate stats??
+    database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
+
+    matches_stats = database.fetch_all_dict("""
+        SELECT
+            q2.*,
+            summoners.name as summoner_name,
+            champions.name as champion_name,
+            champions.id as champion_id,
+            champions.image_icon_url as champion_icon_url,
+            ROUND((tier_diff_cs + tier_diff_vision_wards_placed + tier_diff_assists + tier_diff_deaths + tier_diff_kills + tier_diff_sight_wards_placed + tier_diff_team_first_dragon_kill_time_in_minutes + tier_diff_match_time_in_minutes + tier_diff_damage_done_to_champions)/9) AS overall
+        FROM
+            (
+                SELECT
+                        q1.summoner_champion_id,
+                        q1.match_region,
+                        q1.match_id,
+                        q1.role,
+                        q1.summoner_id,
+                        q1.summoner_team_id,
+                        q1.summoner_rank_tier,
+                        q1.match_create_datetime,
+                        q1.match_total_time_in_minutes,
+                        q1.summoner_is_winner,
+                        q1.summoner_minions_killed,
+                        q1.summoner_neutral_minions_killed,
+                        q1.summoner_assists,
+                        q1.summoner_deaths,
+                        q1.summoner_kills,
+                        q1.summoner_champion_level,
+
+                        CEIL((q1.cs - afd.average_cs) / afd.freelo_dev_cs) AS tier_diff_cs,
+                        CEIL((q1.vision_wards_placed - afd.average_vision_wards_placed) / afd.freelo_dev_vision_wards_placed) AS tier_diff_vision_wards_placed,
+                        CEIL((q1.assists - afd.average_assists) / afd.freelo_dev_assists) AS tier_diff_assists,
+                        CEIL((q1.deaths - afd.average_deaths) / afd.freelo_dev_deaths) AS tier_diff_deaths,
+                        CEIL((q1.kills - afd.average_kills) / afd.freelo_dev_kills) AS tier_diff_kills,
+                        CEIL((q1.sight_wards_placed - afd.average_sight_wards_placed) / afd.freelo_dev_sight_wards_placed) AS tier_diff_sight_wards_placed,
+                        GREATEST(IFNULL(CEIL((q1.team_first_dragon_kill_time_in_minutes - afd.average_cs_first_dragon_time_in_minutes) / afd.freelo_dev_first_dragon_time_in_minutes), -3), -3) AS tier_diff_team_first_dragon_kill_time_in_minutes,
+                        CEIL((q1.match_total_time_in_minutes - afd.average_match_time_in_minutes) / afd.freelo_dev_match_time_in_minutes) AS tier_diff_match_time_in_minutes,
+                        CEIL((q1.damage_done_to_champions - afd.average_damage_done_to_champions) / afd.freelo_dev_damage_done_to_champions) AS tier_diff_damage_done_to_champions
+                FROM
+                    (
+                        SELECT
+                        CASE
+                                WHEN summoner_lane = 'JUNGLE' THEN 'JUNGLE'
+                                WHEN summoner_role = 'DUO_CARRY' THEN 'CARRY'
+                                WHEN summoner_role = 'DUO_SUPPORT' THEN 'SUPPORT'
+                                WHEN
+                                    summoner_lane = 'MIDDLE'
+                                        AND summoner_role IN ('NONE' , 'SOLO')
+                                THEN
+                                    'MIDDLE'
+                                WHEN
+                                    summoner_role = 'SOLO'
+                                        AND summoner_lane != 'MIDDLE'
+                                THEN
+                                    'TOP'
+                                WHEN summoner_minions_killed < 50 THEN 'SUPPORT'
+                                WHEN summoner_role = 'DUO' THEN 'CARRY'
+                                ELSE 'UNKNOWN'
+                            END AS role,
+                            match_region,
+                            match_id,
+                            summoner_champion_id,
+                            summoner_id,
+                            summoner_team_id,
+                            summoner_rank_tier,
+                            match_create_datetime,
+                            (summoner_minions_killed + summoner_neutral_minions_killed_team_jungle + summoner_neutral_minions_killed_enemy_jungle) / match_total_time_in_minutes * 32 AS cs,
+                            summoner_vision_wards_placed / match_total_time_in_minutes * 32 AS vision_wards_placed,
+                            summoner_minions_killed,
+                            (summoner_neutral_minions_killed_team_jungle + summoner_neutral_minions_killed_enemy_jungle) as summoner_neutral_minions_killed,
+                            summoner_assists,
+                            summoner_deaths,
+                            summoner_kills_total as summoner_kills,
+                            summoner_champion_level,
+                            summoner_assists / match_total_time_in_minutes * 32 AS assists,
+                            summoner_deaths / match_total_time_in_minutes * 32 AS deaths,
+                            summoner_kills_total / match_total_time_in_minutes * 32 AS kills,
+                            summoner_sight_wards_placed / match_total_time_in_minutes * 32 AS sight_wards_placed,
+                            team_first_dragon_kill_time_in_minutes,
+                            match_total_time_in_minutes,
+                            summoner_is_winner,
+                            summoner_damage_done_to_champions / match_total_time_in_minutes * 32 AS damage_done_to_champions
+                        FROM
+                            matches
+                        WHERE
+                            summoner_id = {summoner_id}
+                            AND match_region = {region}
+                            AND details_pulled = 1
+                    ) q1
+                LEFT JOIN aggregate_freelo_deviations afd ON afd.champion_role = q1.role
+                    AND afd.champion_id = (CASE q1.summoner_champion_id WHEN 245 THEN 92 ELSE q1.summoner_champion_id END)
+            ) q2
+        INNER JOIN
+            `champions`
+            ON q2.summoner_champion_id = champions.id
+        INNER JOIN
+            `summoners`
+            ON q2.summoner_id = summoners.id
+            AND q2.match_region = summoners.region
+        LIMIT 30
+    """.format(
+        region=database.escape(region),
+        summoner_id=summoner['id'],
+    ))
+    #TODO: disable the Ekko/Riven quick fix in the "LEFT JOIN aggregate_freelo_deviations" section above (swapping 92 for 245 on q1.summoner_champion_id check)
+
+    overall = {}
+    for match_stats in matches_stats:
+        rank_id = RANK_NAME_TO_ID[match_stats['summoner_rank_tier']]
+
+        league = get_diffed_rank(rank_id, match_stats['overall'])
+        if league['name'] not in overall:
+            overall[league['name']] = 0
+        overall[league['name']] += 1
+
+    overall['total'] = len(matches_stats)
+
+    return {
+        'overall': overall,
+    }
+
+
+# looks at the detailed stats of up to the last 30 games and returns a sum of each overall deviation league score which will then be used in a visual chart
+class MatchesStats(restful.Resource):
+    def get(self):
+        # process args
+        parser.add_argument('region', type=str_trimmed, required=True)
+        parser.add_argument('summoner_name', type=str_trimmed, required=True)
+        args = parser.parse_args()
+        region = args['region'].lower()
+        summoner_name = args['summoner_name'].replace(' ', '')
+
+        summoner = get_summoner(region, summoner_name)
+
+        aggregate_stats = db_get_matches_stats(region, summoner)
+
+        return {
+            'stats': aggregate_stats,
+        }
+
+
+
 api.add_resource(Matches, '/1.0/matches')
 api.add_resource(MatchStats, '/1.0/matches/<int:match_id>/stats')
+api.add_resource(MatchesStats, '/1.0/matches/stats')
