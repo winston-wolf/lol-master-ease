@@ -19,7 +19,10 @@ To Setup:
  
  8) Use vagrant as login and password.
  
+ 9) Download all the things!
+  sudo apt-get update
  9) [1m] Run: sudo apt-get update
+ sudo apt-get update
  
 10) [1m] Run: sudo apt-get install git    (Confirm with Y)
 
@@ -31,4 +34,7 @@ To Setup:
 
 14) Run: sudo pip install tornado
 
+15) Run: sudo pip install Flask-RESTful
+
+16) Run: sudo pip install mysqldb
 ???
