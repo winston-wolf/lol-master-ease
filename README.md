@@ -35,6 +35,24 @@ To Setup:
 	
 	sudo apt-get install python-mysqldb
 	
+	sudo apt-get install mysql-server
+		
+		*Note you will be asked to insert a password at this step.  Remember it! Use the same for mariaDB
+	
+	apt-get install mariadb-server
+	
+	sudo su
+	
+	echo never > /sys/kernel/mm/transparent_hugepage/enabled
+	
+	echo never > /sys/kernel/mm/transparent_hugepage/defrag
+	
+	echo "plugin-load=ha_tokudb" > /etc/mysql/conf.d/tokudb.cnf
+	
+	exit
+	
+	
+	
 10) Goto your vagrant folder (Run: cd /vagrant/)
 
 11) Pull the git down using: git clone [urltothetright]
@@ -45,6 +63,6 @@ To Setup:
 
 14) Create a new file settings_local.py!  Do not make a mistake!
 
-15) Copy the setup block over from settings into settings_local.py.  Get your API key from developer.riotgames.com.
+15) Copy the setup block over from settings into settings_local.py.  Get your API key from developer.riotgames.com. Use the password you set earlier for root here as well.
 
 ???
