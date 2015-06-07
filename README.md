@@ -21,20 +21,20 @@ To Setup:
  
  9) Download all the things!
  	
- 	sudo apt-get update
+	sudo apt-get update
  	
- 	sudo apt-get install git
+	sudo apt-get install git
  	
-		git clone [urlfoundtoright]
-		
-		sudo apt-get install python-virtualenv
-		
-		sudo pip install Flask
-		
-		sudo pip install tornado
-		
-		sudo pip install Flask-RESTful
-		
-		sudo apt-get install python-mysqldb
+	git clone [urlfoundtoright]
+	
+	sudo apt-get install python-virtualenv
+	
+	sudo pip install Flask
+	
+	sudo pip install tornado
+	
+	sudo pip install Flask-RESTful
+	
+	sudo apt-get install python-mysqldb
 
 ???
