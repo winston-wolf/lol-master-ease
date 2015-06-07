@@ -14,23 +14,72 @@ App.MatchesController = Ember.ArrayController.extend({
         }
     },
     fetch_match_stats: function(match) {
-        var region = this.get('region'),
-            summoner_name = this.get('summoner_name');
+        var self = this,
+            region = this.get('region'),
+            summoner_name = this.get('summoner_name'),
+            aggregate_analysis = this.get('aggregate_analysis');
 
         match.set('loading_stats', true);
 
         jQuery.getJSON('/api/1.0/matches/'+match.get('match_id')+'/stats?region='+region+'&summoner_name='+summoner_name).done(function(resp) {
             match.set('stats', resp.stats);
             match.set('loading_stats', false);
+
+            var key_factors = resp.stats['stats.key_factors'],
+                league_name = key_factors[0]['totals'][0]['name'].toLowerCase();
+
+            // update overall league counts
+            aggregate_analysis.incrementProperty('overall_league_counts.'+league_name);
+
+            // update highlights
+            self.update_highlights(key_factors);
+
+            // update games loading and loaded count
+            aggregate_analysis.decrementProperty('games_loading');
+            aggregate_analysis.incrementProperty('games_loaded');
         }).fail(function(resp) {
             match.set('loading_stats', false);
         });
+    },
+    update_highlights: function(key_factors) {
+        var aggregate_analysis = this.get('aggregate_analysis');
+
+        var ignore_key_factors = ['Overall', 'First Dragon'];
+        for(var i=0, n=key_factors.length; i<n; ++i) {
+            var key_factor_name = key_factors[i]['name'],
+                league_id = key_factors[i]['totals'][0]['id'];
+
+            // skip those we are ignoring
+            if(ignore_key_factors.indexOf(key_factor_name) != -1) continue;
+
+            // adjust offset total for key factor
+            if(typeof aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name) == 'undefined') {
+                aggregate_analysis.set('highlights.key_factor_league_id_totals.'+key_factor_name, 0);
+            }
+            aggregate_analysis.incrementProperty('highlights.key_factor_league_id_totals.'+key_factor_name, parseInt(league_id, 10));
+            console.log('adding '+league_id+' to '+key_factor_name+' (total: '+aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name)+')')
+
+            // set best key factor
+            if(aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name) > aggregate_analysis.get('highlights.best_key_factor.value') || aggregate_analysis.get('highlights.best_key_factor.name') == key_factor_name) {
+                aggregate_analysis.set('highlights.best_key_factor.name', key_factor_name);
+                aggregate_analysis.set('highlights.best_key_factor.value', parseInt(aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name), 10));
+                console.log('setting best key factor to ', key_factor_name, aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name));
+            }
+
+            // set worst key factor
+            if(aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name) < aggregate_analysis.get('highlights.worst_key_factor.value') || aggregate_analysis.get('highlights.worst_key_factor.name') == key_factor_name) {
+                aggregate_analysis.set('highlights.worst_key_factor.name', key_factor_name);
+                aggregate_analysis.set('highlights.worst_key_factor.value', aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name));
+                console.log('setting worst key factor to ', key_factor_name, aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name));
+            }
+        }
     },
     fetch_more_matches: function() {
         var self = this,
             region = this.get('region'),
             summoner_name = this.get('summoner_name'),
-            page = this.get('page') + 1;
+            page = this.get('page') + 1,
+            aggregate_analysis = this.get('aggregate_analysis');
 
         this.set('page', page);
         this.set('loading_more', true);
@@ -50,6 +99,16 @@ App.MatchesController = Ember.ArrayController.extend({
                 if(!new_match.get('stats')) {
                     matches_needing_stats.push(new_match);
                 }
+                else {
+                    var key_factors = new_match.get('stats.key_factors'),
+                        league_name = key_factors[0]['totals'][0]['name'].toLowerCase();
+
+                    // update overall league counts
+                    aggregate_analysis.incrementProperty('overall_league_counts.'+league_name);
+
+                    // update highlights
+                    self.update_highlights(key_factors);
+                }
 
                 new_matches.push(new_match);
             }
@@ -58,6 +117,11 @@ App.MatchesController = Ember.ArrayController.extend({
             self.set('matches', matches.concat(new_matches));
             self.set('loading', false);
             self.set('loading_more', false);
+
+            // update games loaded and loading count
+            aggregate_analysis.incrementProperty('games_loaded', new_matches.length - matches_needing_stats.length);
+            aggregate_analysis.incrementProperty('games_loading', matches_needing_stats.length);
+            aggregate_analysis.incrementProperty('games_total', new_matches.length);
 
             // get stats for matches that need them
             for(var i=0, n=matches_needing_stats.length; i<n; ++i) {
@@ -105,6 +169,29 @@ App.MatchesRoute = Ember.Route.extend({
         controller.set('summoner_name', params.summoner_name);
         controller.set('page', 0);
         controller.set('matches', []);
+
+        controller.set('aggregate_analysis', Ember.Object.extend({
+            'games_loaded': 0,
+            'games_loading': 0,
+            'games_total': 0,
+            'overall_league_counts': {
+                'wood': 0,
+                'bronze': 0,
+                'silver': 0,
+                'gold': 0,
+                'platinum': 0,
+                'diamond': 0,
+                'master': 0,
+                'challenger': 0,
+                'god': 0
+            },
+            'highlights': {
+                'key_factor_league_id_totals': {},
+                'best_key_factor': {'name': '', 'value': -999},
+                'worst_key_factor': {'name': '', 'value': 999}
+            }
+        }).create());
+
         controller.fetch_more_matches();
     }
 });

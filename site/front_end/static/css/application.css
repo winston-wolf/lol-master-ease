@@ -6,6 +6,11 @@
 body {
   background: #fff;
 }
+#preload-images {
+  top: -9999px;
+  left: -9999px;
+  position: absolute;
+}
 .gradient-background {
   background: #4488c4;
   /* Old browsers */
@@ -349,11 +354,6 @@ tr.row-0 .league-decorator .league-offset,
 .match .match-summary .summoner-champion-container {
   width: 60px;
 }
-.match .match-summary .summoner-champion-container .summoner-champion {
-  display: table-cell;
-  vertical-align: middle;
-  width: 91px;
-}
 .match .match-summary .summoner-champion-container .summoner-champion .summoner-champion-icon {
   width: 60px;
 }
@@ -368,8 +368,6 @@ tr.row-0 .league-decorator .league-offset,
   padding-left: 2px;
 }
 .match .match-summary .summoner-spell-book-container .summoner-spell-book {
-  display: table-cell;
-  vertical-align: middle;
   width: 29px;
   height: 60px;
 }
@@ -380,13 +378,8 @@ tr.row-0 .league-decorator .league-offset,
   display: none;
 }
 .match .match-summary .summoner-stats-container {
-  padding-left: 10px;
+  padding-left: 20px;
   width: 120px;
-}
-.match .match-summary .summoner-stats-container .summoner-stats {
-  display: table-cell;
-  vertical-align: middle;
-  margin-left: 10px;
   padding-top: 9px;
   text-align: left;
 }
@@ -403,11 +396,6 @@ tr.row-0 .league-decorator .league-offset,
 }
 .match .match-summary .summoner-items-container {
   width: 271px;
-}
-.match .match-summary .summoner-items-container .summoner-items {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: left;
   padding-left: 20px;
 }
 .match .match-summary .summoner-items-container .summoner-items .summoner-item {
@@ -468,4 +456,77 @@ tr.row-0 .league-decorator .league-offset,
 .show-more-container {
   margin-top: 10px;
   padding: 10px;
+}
+.overall-performance,
+.highlights-and-tips {
+  text-align: left;
+  height: 261px;
+}
+.overall-performance .loading,
+.highlights-and-tips .loading {
+  line-height: 200px;
+  text-align: center;
+  font-size: 24px;
+}
+.overall-performance h2,
+.highlights-and-tips h2 {
+  margin: 0;
+  margin-bottom: 5px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: left;
+}
+.overall-performance h2 .loading,
+.highlights-and-tips h2 .loading {
+  float: right;
+  font-size: 12px;
+  line-height: 18px;
+}
+.overall-performance .league-performance {
+  margin-top: 15px;
+  padding-left: 15px;
+  opacity: .5;
+}
+.overall-performance .league-performance.has-percent {
+  opacity: 1;
+}
+.overall-performance .league-performance .percent-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 4px;
+  text-align: left;
+  background: #000;
+  transition: width 1s;
+}
+.overall-performance .league-performance .percent-bar:first-child {
+  margin-top: 0;
+}
+.overall-performance .league-performance .percent-bar .percent-bar-color {
+  width: 100%;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid #666;
+}
+.overall-performance .league-performance .percent-bar .league-icon {
+  width: 30px;
+  position: absolute;
+  top: 50%;
+  margin-top: -14px;
+  left: -15px;
+}
+.overall-performance .league-performance .percent-bar .percent-value {
+  position: absolute;
+  height: 26px;
+  line-height: 26px;
+  top: 50%;
+  margin-top: -13px;
+  font-family: 'Open Sans', 'Lato', Segoe, "Segoe UI", Candara, Calibri, Helvetica, AppleSDGothic, "Apple SD Gothic Neo", AppleGothic, Dotumche, Gulimche, Arial, Tahoma, sans-serif, 'Dotum';
+  color: #fff;
+  text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+  font-weight: bold;
+  left: 20px;
+  white-space: nowrap;
+}
+.highlights-and-tips .highlight-average {
+  text-align: center;
 }

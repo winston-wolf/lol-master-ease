@@ -27,6 +27,16 @@
         <link rel="stylesheet" href="/front_end/css/application.css" />
     </head>
     <body>
+        <div id="preload-images">
+            <img src="/front_end/images/league-icons/challenger.png" />
+            <img src="/front_end/images/league-icons/master.png" />
+            <img src="/front_end/images/league-icons/diamond.png" />
+            <img src="/front_end/images/league-icons/platinum.png" />
+            <img src="/front_end/images/league-icons/gold.png" />
+            <img src="/front_end/images/league-icons/silver.png" />
+            <img src="/front_end/images/league-icons/bronze.png" />
+            <img src="/front_end/images/league-icons/unranked.png" />
+        </div>
 
         <script type="text/x-handlebars">
             <header class="navbar my-nav">
@@ -87,22 +97,76 @@
                         {{/if}}
 
                         {{#if matches}}
-                            <h2>Latest Ranked Solo Queue Games</h2>
-                            <div style="margin-bottom: 35px;">
-                                <img src="/front_end/images/league-icons/bronze.png" title="Bronze" />
-                                ⇨
-                                <img src="/front_end/images/league-icons/silver.png" title="Silver" />
-                                ⇨
-                                <img src="/front_end/images/league-icons/gold.png" title="Gold" />
-                                ⇨
-                                <img src="/front_end/images/league-icons/platinum.png" title="Platinum" />
-                                ⇨
-                                <img src="/front_end/images/league-icons/diamond.png" title="Diamond" />
-                                ⇨
-                                <img src="/front_end/images/league-icons/master.png" title="Master" />
-                                ⇨
-                                <img src="/front_end/images/league-icons/challenger.png" title="Challenger" />
+                            <div class="row aggregate_analysis">
+                                <div class="col-md-6">
+                                    <div class="overall-performance well">
+                                        <h2>Performance Over Latest {{aggregate_analysis.games_loaded}} Games{{#if aggregate_analysis.games_loading}}<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading {{aggregate_analysis.games_loading}} more {{pluralize 'game' value=aggregate_analysis.games_loading}}...</div>{{/if}}</h2>
+                                        <div class="league-performance {{if aggregate_analysis.overall_league_counts.challenger 'has-percent'}}">
+                                            <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.challenger total=aggregate_analysis.games_loaded}}%;">
+                                                <div class="percent-bar-color" style="background: linear-gradient(to right, rgba(17, 132, 194, .7), rgb(17, 132, 194));"></div>
+                                                <img class="league-icon" src="/front_end/images/league-icons/challenger.png" />
+                                                <div class="percent-value">{{percent aggregate_analysis.overall_league_counts.challenger total=aggregate_analysis.games_loaded}}% Challenger</div>
+                                            </div>
+                                        </div>
+                                        <div class="league-performance {{if aggregate_analysis.overall_league_counts.master 'has-percent'}}">
+                                            <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.master total=aggregate_analysis.games_loaded}}%;">
+                                                <div class="percent-bar-color" style="background: linear-gradient(to right, rgba(93, 110, 103, .7), rgb(93, 110, 103));"></div>
+                                                <img class="league-icon" src="/front_end/images/league-icons/master.png" />
+                                                <div class="percent-value">{{percent aggregate_analysis.overall_league_counts.master total=aggregate_analysis.games_loaded}}% Master</div>
+                                            </div>
+                                        </div>
+                                        <div class="league-performance {{if aggregate_analysis.overall_league_counts.diamond 'has-percent'}}">
+                                            <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.diamond total=aggregate_analysis.games_loaded}}%;">
+                                                <div class="percent-bar-color" style="background: linear-gradient(to right, rgba(122, 191, 214, .7), rgb(122, 191, 214));"></div>
+                                                <img class="league-icon" src="/front_end/images/league-icons/diamond.png" />
+                                                <div class="percent-value">{{percent aggregate_analysis.overall_league_counts.diamond total=aggregate_analysis.games_loaded}}% Diamond</div>
+                                            </div>
+                                        </div>
+                                        <div class="league-performance {{if aggregate_analysis.overall_league_counts.platinum 'has-percent'}}">
+                                            <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.platinum total=aggregate_analysis.games_loaded}}%;">
+                                                <div class="percent-bar-color" style="background: linear-gradient(to right, rgba(149, 232, 217, .7), rgb(149, 232, 217));"></div>
+                                                <img class="league-icon" src="/front_end/images/league-icons/platinum.png" />
+                                                <div class="percent-value">{{percent aggregate_analysis.overall_league_counts.platinum total=aggregate_analysis.games_loaded}}% Platinum</div>
+                                            </div>
+                                        </div>
+                                        <div class="league-performance {{if aggregate_analysis.overall_league_counts.gold 'has-percent'}}">
+                                            <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.gold total=aggregate_analysis.games_loaded}}%;">
+                                                <div class="percent-bar-color" style="background: linear-gradient(to right, rgba(242, 211, 109, .7), rgb(242, 211, 109));"></div>
+                                                <img class="league-icon" src="/front_end/images/league-icons/gold.png" />
+                                                <div class="percent-value">{{percent aggregate_analysis.overall_league_counts.gold total=aggregate_analysis.games_loaded}}% Gold</div>
+                                            </div>
+                                        </div>
+                                        <div class="league-performance {{if aggregate_analysis.overall_league_counts.silver 'has-percent'}}">
+                                            <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.silver total=aggregate_analysis.games_loaded}}%;">
+                                                <div class="percent-bar-color" style="background: linear-gradient(to right, rgba(131, 150, 135, .7), rgb(131, 150, 135));"></div>
+                                                <img class="league-icon" src="/front_end/images/league-icons/silver.png" />
+                                                <div class="percent-value">{{percent aggregate_analysis.overall_league_counts.silver total=aggregate_analysis.games_loaded}}% Silver</div>
+                                            </div>
+                                        </div>
+                                        <div class="league-performance {{if aggregate_analysis.overall_league_counts.bronze 'has-percent'}}">
+                                            <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.bronze total=aggregate_analysis.games_loaded}}%;">
+                                                <div class="percent-bar-color" style="background: linear-gradient(to right, rgba(92, 60, 34, .7), rgb(92, 60, 34));"></div>
+                                                <img class="league-icon" src="/front_end/images/league-icons/bronze.png" />
+                                                <div class="percent-value">{{percent aggregate_analysis.overall_league_counts.bronze total=aggregate_analysis.games_loaded}}% Bronze</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="highlights-and-tips well">
+                                        <h2>Highlights & Tips</h2>
+                                        {{#if aggregate_analysis.games_loading}}
+                                            <div class="loading"><i class="fa fa-spinner fa-spin"></i> Analyzing games...</div>
+                                        {{else}}
+                                            {{highlights-and-tips aggregate_analysis=aggregate_analysis}}
+                                        {{/if}}
+                                    </div>
+                                </div>
+
                             </div>
+
+                            <h2>Latest Ranked Solo Queue Games</h2>
                         {{/if}}
 
                         {{#each matches as |match|}}
@@ -189,6 +253,37 @@
                         {{/if}}
                     {{/if}}
                 </div>
+            </div>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="components/highlights-and-tips">
+            <div class="row">
+                <div class="col-md-6 highlight-average">
+                    <div class="alert alert-success">
+                        <div><strong>Best Average</strong></div>
+                        {{#if best_league_name}}
+                            <img class="league-icon" src="/front_end/images/league-icons/{{lowercase best_league_name}}.png" title="{{ucwords best_league_name}}" />
+                            {{best_key_factor_name}}
+                        {{/if}}
+                    </div>
+                </div>
+
+                <div class="col-md-6 highlight-average">
+                    <div class="alert alert-danger">
+                        <div><strong>Worst Average</strong></div>
+                        {{#if worst_league_name}}
+                            <img class="league-icon" src="/front_end/images/league-icons/{{lowercase worst_league_name}}.png" title="{{ucwords worst_league_name}}" />
+                            {{worst_key_factor_name}}
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                {{#if worst_league_tip}}
+                    <div><strong>{{worst_key_factor_name}} Tips</strong></div>
+                    <div>{{worst_league_tip}}</div>
+                {{/if}}
             </div>
         </script>
 

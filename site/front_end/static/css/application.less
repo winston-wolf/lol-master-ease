@@ -10,6 +10,12 @@ body {
   background: #fff;
 }
 
+#preload-images {
+  top: -9999px;
+  left: -9999px;
+  position: absolute;
+}
+
 @main-background-color: #4488c4;
 
 .gradient-background {
@@ -400,9 +406,6 @@ table.table-stats {
       width: 60px;
 
       .summoner-champion {
-        display: table-cell;
-        vertical-align: middle;
-        width: 91px;
 
         .summoner-champion-icon {
           width: 60px;
@@ -422,8 +425,6 @@ table.table-stats {
       padding-left: 2px;
 
       .summoner-spell-book {
-        display: table-cell;
-        vertical-align: middle;
         width: 29px;
         height: 60px;
 
@@ -437,15 +438,12 @@ table.table-stats {
     }
 
     .summoner-stats-container {
-      padding-left: 10px;
+      padding-left: 20px;
       width: 120px;
+      padding-top: 9px;
+      text-align: left;
 
       .summoner-stats {
-        display: table-cell;
-        vertical-align: middle;
-        margin-left: 10px;
-        padding-top: 9px;
-        text-align: left;
 
         .stat-score,
         .stat-minions {
@@ -464,12 +462,9 @@ table.table-stats {
 
     .summoner-items-container {
       width: 271px;
+      padding-left: 20px;
 
       .summoner-items {
-        display: table-cell;
-        vertical-align: middle;
-        text-align: left;
-        padding-left: 20px;
 
         .summoner-item {
           float: left;
@@ -548,4 +543,91 @@ table.table-stats {
 .show-more-container {
   margin-top: 10px;
   padding: 10px;
+}
+
+
+.overall-performance,
+.highlights-and-tips {
+  text-align: left;
+  height: 261px;
+
+  .loading {
+    line-height: 200px;
+    text-align: center;
+    font-size: 24px;
+  }
+
+  h2 {
+    margin: 0;
+    margin-bottom: 5px;
+    font-size: 18px;
+    line-height: 18px;
+    text-align: left;
+
+    .loading {
+      float: right;
+      font-size: 12px;
+      line-height: 18px;
+    }
+  }
+}
+
+.overall-performance {
+  .league-performance {
+    margin-top: 15px;
+    padding-left: 15px;
+    opacity: .5;
+
+    &.has-percent {
+      opacity: 1;
+    }
+
+    .percent-bar {
+      position: relative;
+      height: 14px;
+      border-radius: 4px;
+      text-align: left;
+      background: #000;
+      transition: width 1s;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      .percent-bar-color {
+        width: 100%;
+        height: 14px;
+        border-radius: 3px;
+        border: 1px solid #666;
+      }
+
+      .league-icon {
+        width: 30px;
+        position: absolute;
+        top: 50%;
+        margin-top: -14px;
+        left: -15px;
+      }
+
+      .percent-value {
+        position: absolute;
+        height: 26px;
+        line-height: 26px;
+        top: 50%;
+        margin-top: -13px;
+        font-family: 'Open Sans','Lato',Segoe,"Segoe UI",Candara,Calibri,Helvetica,AppleSDGothic,"Apple SD Gothic Neo",AppleGothic,Dotumche,Gulimche,Arial,Tahoma,sans-serif,'Dotum';
+        color: #fff;
+        text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+        font-weight: bold;
+        left: 20px;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.highlights-and-tips {
+  .highlight-average {
+    text-align: center;
+  }
 }

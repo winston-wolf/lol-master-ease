@@ -338,11 +338,11 @@ def db_get_match_stats(match_id, region, summoner):
                 'name': 'First Dragon',
                 'totals': [],
             },
-            {
-                'id': 'match_time',
-                'name': 'Game Length',
-                'totals': [],
-            },
+            # {
+            #     'id': 'match_time',
+            #     'name': 'Game Length',
+            #     'totals': [],
+            # },
             {
                 'id': 'damage_done_to_champions',
                 'name': 'Damage to Champions',
@@ -401,7 +401,7 @@ def db_get_match_stats(match_id, region, summoner):
         stats_key_factors['deaths']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_deaths']))
         stats_key_factors['kills']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_kills']))
         stats_key_factors['first_dragon']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_team_first_dragon_kill_time_in_minutes']))
-        stats_key_factors['match_time']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_match_time_in_minutes']))
+        # stats_key_factors['match_time']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_match_time_in_minutes']))
         stats_key_factors['damage_done_to_champions']['totals'].append(get_diffed_rank(rank_id, player_game['tier_diff_damage_done_to_champions']))
 
     return match_stats
