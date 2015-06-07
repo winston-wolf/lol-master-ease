@@ -23,7 +23,7 @@ DATABASE_NAME = 'lol_master_ease'
 # ---------------------------------------------------- #
 
 API_HOST = '{region}.api.pvp.net'
-API_URL_SUMMONER_SEARCH = 'https://{region}.api.pvp.net/api/lol/{region}/v2.2/summoner/by-name/{summonerName}?api_key={apiKey}'
+API_URL_SUMMONER_SEARCH = 'https://{region}.api.pvp.net/api/lol/{region}/v1.4/summoner/by-name/{summonerName}?api_key={apiKey}'
 API_URL_CHAMPIONS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion?champData=image&api_key={apiKey}'
 API_URL_SUMMONER_SPELLS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/summoner-spell?spellData=image&api_key={apiKey}'
 API_URL_ITEMS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/item?itemListData=image&api_key={apiKey}'
