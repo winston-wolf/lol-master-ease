@@ -3,17 +3,17 @@ Analyzes League of Legends game stats for a summoner and gives granular rankings
 
 To Setup:
 
- 1) [2m] Download & Virtual Box: https://www.virtualbox.org/wiki/Downloads
+ 1) Download & Virtual Box: https://www.virtualbox.org/wiki/Downloads
  
- 2) [2m] Download & Install Vangrant: https://www.vagrantup.com/downloads.html
+ 2) Download & Install Vangrant: https://www.vagrantup.com/downloads.html
  
- 3) [1m] Goto the folder you want to hold your local version in with cd [filepath]
+ 3) Goto the folder you want to hold your local version in with cd [filepath]
  
- 4) [5m] Run: vagrant init ubuntu/trusty64
+ 4) Run in host commandline: vagrant init ubuntu/trusty64
  
- 5) [2m] Run: vagrant up
+ 5) Run in host commandline: vagrant up
  
- 6) [1m] Dpwnload and install putty: http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html
+ 6) Dpwnload and install putty: http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html
  
  7) Run putty and connect to 127.0.0.1 as hostname and 2222 as port
  
@@ -37,11 +37,17 @@ To Setup:
 	
 	sudo apt-get install python-mysqldb
 	
-	sudo apt-get install mysql-server
-		
-		*Note you will be asked to insert a password at this step.  Remember it! Use the same for mariaDB
+	sudo apt-get install software-properties-common
 	
-	apt-get install mariadb-server
+	sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
+	
+	sudo add-apt-repository 'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
+	
+	sudo apt-get update 
+	
+	sudo apt-get install mariadb-server
+	
+		*Note you will be asked to insert a password at this step.  Remember it! Use it in settings_local.py
 	
 	sudo su
 	
@@ -49,11 +55,13 @@ To Setup:
 	
 	echo never > /sys/kernel/mm/transparent_hugepage/defrag
 	
-	echo "plugin-load=ha_tokudb" > /etc/mysql/conf.d/tokudb.cnf
-	
 	exit
 	
-	
+	sudo nano /etc/mysql/conf.d/tokudb.cnf
+		
+		Remove the # on the line #plugin-load-add=ha_tokudb.so
+		
+		Hit ctrl+x and then Y to save changes
 	
 10) Goto your vagrant folder (Run: cd /vagrant/)
 
@@ -65,6 +73,26 @@ To Setup:
 
 14) Create a new file settings_local.py!  Do not make a mistake!
 
-15) Copy the setup block over from settings into settings_local.py.  Get your API key from developer.riotgames.com. Use the password you set earlier for root here as well.
+15) Copy the setup block over from settings.py into settings_local.py.  Get your API key from developer.riotgames.com. Use the password you set earlier for root here as well.
 
-???
+16) Goto your vagrant file on your host machine and uncomment his line:
+
+	config.vm.network "forwarded_port", guest: 80, host: 8080
+
+17) Run in host command line: vagrant reload
+
+18) Reconnect to 127.0.0.1 port 22 with vagrant/vangrant.
+
+19) Database setup time!
+
+	sudo mysql service start
+	
+	echo "create database lol_master_ease" | mysql -uroot -p
+	
+	mysql -uroot -p lol_master_ease < schemadump20150606.sql
+		
+		*Note this filename might change as we update the schema.
+	
+20) sudo python /vagrant/lol-master-ease/site/server.py
+
+21) Goto 127.0.0.1:8080 in your browser and you should now see your local branch!
