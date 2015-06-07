@@ -46,6 +46,8 @@ MATCH_DELTA_TIMES = {
 SEASON_NAME = 'SEASON2015'
 MATCHES_PER_PAGE = 15
 
+PLATFORM_IDS = {'na': 'NA1', 'ru': 'RU', 'br': 'BR1', 'oce': 'OC1', 'euw': 'EUW1', 'eune': 'EUN1', 'kr': 'KR', 'lan': 'LA1', 'las': 'LA2', 'tr': 'TR1'}
+
 # allow local settings override
 try:
     from settings_local import *

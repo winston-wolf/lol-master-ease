@@ -5,7 +5,7 @@ from time import sleep
 
 from db import get_connection
 from settings import API_URL_SUMMONER_SEARCH, API_URL_MATCH_HISTORY, API_URL_MATCH
-from settings import SEASON_NAME, RANK_TIERS, MATCHES_PER_PAGE
+from settings import SEASON_NAME, RANK_TIERS, MATCHES_PER_PAGE, PLATFORM_IDS
 from settings import DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME
 
 import player_helper
@@ -63,8 +63,10 @@ def get_summoner(region, summoner_name):
             data = response.get(summoner_name)
 
             summoner = {
-                'id': data.get('summonerId'),
-                'platform': data.get('currentUser').get('platformId'),
+                # 'id': data.get('summonerId'),
+                # 'platform': data.get('currentUser').get('platformId'),
+                'id': data.get('id'),
+                'platform': PLATFORM_IDS[region],
                 'can_refresh': True,
             }
         except Exception, e:
