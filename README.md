@@ -20,6 +20,7 @@ To Setup:
  8) Use vagrant as login and password.
  
  9) Download all the things!
+ 
   sudo apt-get update
  9) [1m] Run: sudo apt-get update
  sudo apt-get update
