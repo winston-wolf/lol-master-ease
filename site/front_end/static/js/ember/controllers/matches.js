@@ -25,7 +25,7 @@ App.MatchesController = Ember.ArrayController.extend({
             match.set('stats', resp.stats);
             match.set('loading_stats', false);
 
-            var key_factors = resp.stats['stats.key_factors'],
+            var key_factors = resp.stats['key_factors'],
                 league_name = key_factors[0]['totals'][0]['name'].toLowerCase();
 
             // update overall league counts
