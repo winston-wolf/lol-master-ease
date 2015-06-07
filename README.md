@@ -33,6 +33,8 @@ To Setup:
 	
 	sudo pip install Flask-RESTful
 	
+	sudo apt-get install libevent-1.4
+	
 	sudo apt-get install python-mysqldb
 	
 	sudo apt-get install mysql-server
