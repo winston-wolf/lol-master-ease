@@ -20,22 +20,21 @@ To Setup:
  8) Use vagrant as login and password.
  
  9) Download all the things!
- 
-  sudo apt-get update
- 9) [1m] Run: sudo apt-get update
- sudo apt-get update
- 
-10) [1m] Run: sudo apt-get install git    (Confirm with Y)
+ 	
+ 	sudo apt-get update
+ 	
+ 	sudo apt-get install git
+ 	
+		git clone [urlfoundtoright]
+		
+		sudo apt-get install python-virtualenv
+		
+		sudo pip install Flask
+		
+		sudo pip install tornado
+		
+		sudo pip install Flask-RESTful
+		
+		sudo apt-get install python-mysqldb
 
-11) [1m] Run: git clone [urlfoundtoright]
-
-12) Run: sudo apt-get install python-virtualenv
-
-13) Run: sudo pip install Flask
-
-14) Run: sudo pip install tornado
-
-15) Run: sudo pip install Flask-RESTful
-
-16) Run: sudo pip install mysqldb
 ???
