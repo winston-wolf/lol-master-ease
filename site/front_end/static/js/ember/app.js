@@ -19,9 +19,9 @@ var REGIONS = ['BR','EUNE','EUW','KR','LAN','LAS','NA','OCE','RU','TR'],
         'Vision Wards': 'Try and keep a vision ward on the map at all times, even if you just chuck it into a bush in your jungle. If you are support and doing well, don\'t be afraid to carry more than 1 pink so you are ready for any situation.',
         'Assists': 'Unless you got tons of kills or are a split pushing monster, you probably aren\'t participating in team fights enough. A good team is one where players anticipate and respond quickly to threats and opportunities. Look out for pings, keep an eye on your minimap, and avoid tunnel vision.',
         'Deaths': 'First rule of LoL, don\'t die. Second rule, <i>don\'t die!</i> Do you get caught out of position a lot? Are you too aggressive and dive too much? Figure out what you are doing wrong and correct it. Playing safe when outmatched will win you more games than going HAM when you are behind. Also, if a teammate is clearly going to die, don\'t feel like you have to jump in to try and save them if you will just end up dying as well.',
-        'Kills': 'tip tip tip',
-        'Sight Wards': 'tip tip tip',
-        'Damage to Champions': 'tip tip tip'
+        'Kills': '',
+        'Sight Wards': '',
+        'Damage to Champions': ''
     };
 
 function get_error(error_key) {
