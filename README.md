@@ -4,6 +4,7 @@ Analyzes League of Legends game stats for a summoner and gives granular rankings
 To Setup:
 
  1) [2m] Download & Virtual Box: https://www.virtualbox.org/wiki/Downloads
+ 
  2) [2m] Download & Install Vangrant: https://www.vagrantup.com/downloads.html
  3) [1m] Goto the folder you want to hold your files in with cd [filepath]
  4) [5m] Run: vagrant init ubuntu/trusty64
