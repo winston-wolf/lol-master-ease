@@ -57,20 +57,18 @@ App.MatchesController = Ember.ArrayController.extend({
                 aggregate_analysis.set('highlights.key_factor_league_id_totals.'+key_factor_name, 0);
             }
             aggregate_analysis.incrementProperty('highlights.key_factor_league_id_totals.'+key_factor_name, parseInt(league_id, 10));
-            console.log('adding '+league_id+' to '+key_factor_name+' (total: '+aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name)+')')
 
             // set best key factor
             if(aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name) > aggregate_analysis.get('highlights.best_key_factor.value') || aggregate_analysis.get('highlights.best_key_factor.name') == key_factor_name) {
                 aggregate_analysis.set('highlights.best_key_factor.name', key_factor_name);
                 aggregate_analysis.set('highlights.best_key_factor.value', parseInt(aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name), 10));
-                console.log('setting best key factor to ', key_factor_name, aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name));
+
             }
 
             // set worst key factor
             if(aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name) < aggregate_analysis.get('highlights.worst_key_factor.value') || aggregate_analysis.get('highlights.worst_key_factor.name') == key_factor_name) {
                 aggregate_analysis.set('highlights.worst_key_factor.name', key_factor_name);
                 aggregate_analysis.set('highlights.worst_key_factor.value', aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name));
-                console.log('setting worst key factor to ', key_factor_name, aggregate_analysis.get('highlights.key_factor_league_id_totals.'+key_factor_name));
             }
         }
     },
@@ -156,6 +154,8 @@ App.MatchesRoute = Ember.Route.extend({
 
     },
     model: function(params) {
+        console.log('running model thingy');
+
         var self = this,
             controller = this.controllerFor('matches');
 
@@ -169,6 +169,7 @@ App.MatchesRoute = Ember.Route.extend({
         controller.set('summoner_name', params.summoner_name);
         controller.set('page', 0);
         controller.set('matches', []);
+        this.store.unloadAll('match');
 
         controller.set('aggregate_analysis', Ember.Object.extend({
             'games_loaded': 0,
