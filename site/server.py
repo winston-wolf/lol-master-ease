@@ -36,6 +36,9 @@ app.register_blueprint(api_app)
 logging.getLogger('tornado.access').setLevel(logging.INFO)
 
 if __name__ == "__main__":
+    app.run(port=8000)
+"""
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(80)
     IOLoop.instance().start()
+"""

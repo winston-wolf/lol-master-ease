@@ -32,7 +32,7 @@ from settings import DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_P
 from settings import API_URL_MATCH_HISTORY, API_URL_MATCH
 from settings import SEASON_NAME
 
-THREADS = 16
+THREADS = 2
 
 # ---------------------------------------------------- #
 # Logging
