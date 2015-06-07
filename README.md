@@ -34,10 +34,17 @@ To Setup:
 	sudo pip install Flask-RESTful
 	
 	sudo apt-get install python-mysqldb
+	
 10) Goto your vagrant folder (Run: cd /vagrant/)
+
 11) Pull the git down using: git clone [urltothetright]
+
 12) Back to your machine!
+
 13) Download your prefered IDE (such as sublime) and point it at lol-master-ease in the folder you saved your vagrant box in.
+
 14) Create a new file settings_local.py!  Do not make a mistake!
+
 15) Copy the setup block over from settings into settings_local.py.  Get your API key from developer.riotgames.com.
+
 ???
