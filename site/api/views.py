@@ -23,6 +23,19 @@ RANK_MAX = len(RANK_TIERS) - 1
 RANK_ID_TO_NAME = {_id: name for _id, name in enumerate(RANK_TIERS)}
 RANK_NAME_TO_ID = {name: _id for _id, name in RANK_ID_TO_NAME.items()}
 
+MISSING_ITEM_TEMP_FIX_SQL = u"""
+    AND (0
+        OR summoner_item_0_id != 0
+        OR summoner_item_1_id != 0
+        OR summoner_item_2_id != 0
+        OR summoner_item_3_id != 0
+        OR summoner_item_4_id != 0
+        OR summoner_item_5_id != 0
+        OR summoner_item_6_id != 0
+        OR match_create_datetime > '2015-06-02 00:00:00'
+    )
+"""
+
 
 # returns a trimmed string value as an argument type
 def str_trimmed(value):
@@ -128,17 +141,19 @@ def db_get_match_ids(region, summoner, begin_index, end_index):
         FROM
             matches
         WHERE 1
-            AND match_region = {}
-            AND summoner_id = {}
+            AND match_region = {region}
+            AND summoner_id = {summoner_id}
+            {missing_item_temp_fix_sql}
         ORDER BY
             match_create_datetime DESC
-        LIMIT {}
-        OFFSET {}
+        LIMIT {limit}
+        OFFSET {offset}
     """.format(
-        database.escape(region),
-        summoner['id'],
-        (end_index - begin_index),
-        begin_index,
+        region=database.escape(region),
+        summoner_id=summoner['id'],
+        limit=(end_index - begin_index),
+        offset=begin_index,
+        missing_item_temp_fix_sql=MISSING_ITEM_TEMP_FIX_SQL,
     )
 
     logger.warning('[db_get_match_ids] SQL: {}'.format(sql))
@@ -423,7 +438,6 @@ def api_pull_match_history(region, summoner, begin_index):
 
     if response:
         matches = response.get('matches', [])
-
         if matches:
             # see which matches we already have recorded
             sql = u"""
@@ -432,16 +446,19 @@ def api_pull_match_history(region, summoner, begin_index):
                 FROM
                     matches
                 WHERE 1
-                    AND summoner_id = {}
-                    AND match_region = {}
-                    AND match_id IN ({})
+                    AND match_region = {region}
+                    AND summoner_id = {summoner_id}
+                    AND match_id IN ({match_ids})
+                    {missing_item_temp_fix_sql}
                 """.format(
-                    summoner['id'],
-                    database.escape(region),
-                    ','.join(str(match['matchId']) for match in matches),
+                    region=database.escape(region),
+                    summoner_id=summoner['id'],
+                    match_ids=','.join(str(match['matchId']) for match in matches),
+                    missing_item_temp_fix_sql=MISSING_ITEM_TEMP_FIX_SQL,
                 )
             recorded_match_ids = database.fetch_all_value(sql)
 
+            logger.warning('[api_pull_match_history] sql: {}'.format(sql))
             logger.warning('[api_pull_match_history] recorded match ids: {}'.format(recorded_match_ids))
 
             match_stats = []
