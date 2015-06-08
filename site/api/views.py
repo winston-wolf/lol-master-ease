@@ -18,6 +18,9 @@ api = restful.Api(api_app)
 parser = reqparse.RequestParser()
 import logging
 logger = logging.getLogger('freelo')
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+logger.addHandler(ch)
 
 RANK_MAX = len(RANK_TIERS) - 1
 RANK_ID_TO_NAME = {_id: name for _id, name in enumerate(RANK_TIERS)}
@@ -63,7 +66,7 @@ def get_summoner(region, summoner_name):
     )
 
     summoner = database.fetch_one_dict(sql)
-    logger.warning('[get_summoner] summoner: {}'.format(summoner))
+    logger.warning('[get_summoner] summoner: {} with sql {}'.format(summoner, sql))
 
     if not summoner:
         try:
@@ -82,8 +85,8 @@ def get_summoner(region, summoner_name):
                 'platform': PLATFORM_IDS[region],
                 'can_refresh': True,
             }
-        except Exception, e:
-            logger.warning('BAM: {}'.format(e))
+        except Exception as e:
+            logger.warning('[get_summoner] Exception: {}'.format(e))
             return False
 
     return summoner
@@ -93,13 +96,9 @@ def get_summoner(region, summoner_name):
 def find_match_ids(region, summoner, begin_index, end_index):
     database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
 
-    logger.warning('[find_match_ids] begin_index {}'.format(begin_index))
-    logger.warning('[find_match_ids] end_index {}'.format(end_index))
-    logger.warning('[find_match_ids] summoner {}'.format(summoner))
-
     # if loading the first page and a refresh is possible, pull new data from the api
     if begin_index == 0 and summoner['can_refresh']:
-        logger.warning('[find_match_ids] getting api matches 1')
+        logger.warning('[find_match_ids] getting api matches')
         api_pull_match_history(region, summoner, begin_index)
 
         # update the last refresh datetime since we just refreshed
@@ -434,9 +433,9 @@ def api_pull_match_history(region, summoner, begin_index):
     # fetch matches from the api
     logger.warning('[api_pull_match_history] adding request for match history of {}'.format(summoner['id']))
     response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index)
-    logger.warning('[api_pull_match_history] got {} matches: [{}]'.format(len(response.get('matches', [])), [str(match['matchId']) for match in response.get('matches', [])]))
 
     if response:
+        logger.warning('[api_pull_match_history] got {} matches: [{}]'.format(len(response.get('matches', [])), [str(match['matchId']) for match in response.get('matches', [])]))
         matches = response.get('matches', [])
         if matches:
             # see which matches we already have recorded
@@ -539,7 +538,7 @@ class Matches(restful.Resource):
         parser.add_argument('page', type=int)
         args = parser.parse_args()
         region = args['region'].lower()
-        summoner_name = args['summoner_name'].replace(' ', '')
+        summoner_name = args['summoner_name'].replace(' ', '').lower()
         page = args['page']
         if not page:
             page = 1
@@ -663,7 +662,7 @@ class MatchStats(restful.Resource):
         parser.add_argument('summoner_name', type=str_trimmed, required=True)
         args = parser.parse_args()
         region = args['region'].lower()
-        summoner_name = args['summoner_name'].replace(' ', '')
+        summoner_name = args['summoner_name'].replace(' ', '').lower()
 
         summoner = get_summoner(region, summoner_name)
 
@@ -811,7 +810,7 @@ class MatchesStats(restful.Resource):
         parser.add_argument('summoner_name', type=str_trimmed, required=True)
         args = parser.parse_args()
         region = args['region'].lower()
-        summoner_name = args['summoner_name'].replace(' ', '')
+        summoner_name = args['summoner_name'].replace(' ', '').lower()
 
         summoner = get_summoner(region, summoner_name)
 
@@ -820,7 +819,6 @@ class MatchesStats(restful.Resource):
         return {
             'stats': aggregate_stats,
         }
-
 
 
 api.add_resource(Matches, '/1.0/matches')
