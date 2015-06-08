@@ -15,13 +15,13 @@ var REGIONS = ['BR','EUNE','EUW','KR','LAN','LAS','NA','OCE','RU','TR'],
         }
     },
     TIPS = {
-        'CS': 'Try practicing last hitting in a custom game or find a guide on minion control/jungle paths. If you are in a lane, you might also try grabbing jungle camps after pushing to the enemy turret. Just don\'t steal from your jungler!',
-        'Vision Wards': 'Try and keep a vision ward on the map at all times, even if you just chuck it into a bush in your jungle. If you are support and doing well, don\'t be afraid to carry more than 1 pink so you are ready for any situation.',
+        'CS': 'Try practicing last hitting in a custom game or find a guide on minion control/jungle paths. This is THE most important factor in winning. If you are in a lane, try grabbing jungle camps after pushing to the enemy turret. Just don\'t steal from your jungler! Even as support try to pick up CS your partner can\'t get to.',
+        'Vision Wards': 'Try and keep a vision ward on the map at all times, even if you just put it into a bush in your jungle. If you are support and doing well, don\'t be afraid to carry more than 1 pink so you are ready for any situation.',
         'Assists': 'Unless you got tons of kills or are a split pushing monster, you probably aren\'t participating in team fights enough. A good team is one where players anticipate and respond quickly to threats and opportunities. Look out for pings, keep an eye on your minimap, and avoid tunnel vision.',
-        'Deaths': 'First rule of LoL, don\'t die. Second rule, <i>don\'t die!</i> Do you get caught out of position a lot? Are you too aggressive and dive too much? Figure out what you are doing wrong and correct it. Playing safe when outmatched will win you more games than going HAM when you are behind. Also, if a teammate is clearly going to die, don\'t feel like you have to jump in to try and save them if you will just end up dying as well.',
-        'Kills': '',
-        'Sight Wards': '',
-        'Damage to Champions': ''
+        'Deaths': 'First rule of LoL, don\'t die. Second rule, DON\'T DIE! Pull back on that aggression cowboy. 1 kill for 1 death is rarely #worthit. Playing safe when outmatched or countered will win you more games than going HAM when you are behind. If a teammate is clearly going to die, don\'t feel like you have to jump in and die as well.',
+        'Kills': 'Don\'t be afraid to be a little more aggressive and secure kills.  Try flash initiating more and make sure you know damage spikes matchups with your champions.',
+        'Sight Wards': 'If you\'re leaving base with 75g and an open inventory slot you are doing it wrong.  Every bit of vision counts and a sight ward can easily net you another 2 CS safely. If a ward saves you from a gank its already paid for 6 wards!',
+        'Damage to Champions': 'Don\'t hang so far back in the fights.  Autoattacks matter even on support.  Every second you have a spell on CD or are out of range you\'re losing DPS.  In lane, make sure you aren\'t taking harass for free. Be more patient on skillshots to make sure they land. 1 that hits is better than 5 that miss!'
     };
 
 function get_error(error_key) {
