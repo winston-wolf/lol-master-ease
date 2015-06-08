@@ -36,6 +36,10 @@ app.register_blueprint(api_app)
 logging.getLogger('tornado.access').setLevel(logging.INFO)
 
 if __name__ == "__main__":
+    handler = logging.handlers.RotatingFileHandler('/var/log/freelo.log', maxBytes=10000, backupCount=1)
+    handler.setLevel(logging.ERROR)
+    app.logger.addHandler(handler)
+
     app.run(port=8000)
 """
     http_server = HTTPServer(WSGIContainer(app))
