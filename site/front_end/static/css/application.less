@@ -1,5 +1,19 @@
+.group {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
 body {
   background: #fff;
+}
+
+#preload-images {
+  top: -9999px;
+  left: -9999px;
+  position: absolute;
 }
 
 @main-background-color: #4488c4;
@@ -50,11 +64,7 @@ body {
   padding-top: 10px;
 }
 
-.league-icon {
-  width: 35px;
-}
-
-.my-stats {
+.matches {
   padding-top: 35px;
   padding-bottom: 40px;
   text-align: center;
@@ -67,12 +77,20 @@ body {
 }
 
 table.table-stats {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
   background: #fff;
+  margin-bottom: 0;
+
+  tr:first-child {
+    td {
+      border-top: 0;
+    }
+  }
 
   tr.header {
+//    td {
+//      white-space: nowrap;
+//    }
+
     td.team-blue,
     td.team-red {
       position: relative;
@@ -101,9 +119,6 @@ table.table-stats {
     border-top: 2px groove #bbb;
   }
 
-  tr.total {
-
-  }
   td.current-player {
     background: #dbeeff;
   }
@@ -164,5 +179,455 @@ table.table-stats {
     &.expand {
       display: table-cell;
     }
+  }
+}
+
+.player-link {
+  line-height: 1em;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 85px;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.league-decorator {
+  position: relative;
+  display: inline-block;
+
+  .league-icon {
+    height: 30px;
+  }
+
+  .league-offset {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin-left: 36px;
+    margin-top: -15px;
+    font-weight: bold;
+
+    &.played-up {
+      color: #3c763d;
+
+      .league-offset-icon {
+        top: -8px;
+        left: 50%;
+        margin-left: -2px;
+      }
+    }
+    &.played-down {
+      color: #a94442;
+
+      .league-offset-icon {
+        bottom: -8px;
+        left: 50%;
+        margin-left: -2px;
+      }
+    }
+    &.played-normal {
+      color: #888;
+    }
+
+    &.played-up .league-offset-icon,
+    &.played-down .league-offset-icon {
+      position: absolute;
+    }
+
+    .league-offset-value,
+    .league-offset-icon {
+      float: left;
+      line-height: 30px;
+    }
+
+    .league-offset-value {
+      margin-left: 2px;
+      font-size: 14px;
+    }
+
+    .league-offset-icon {
+      font-size: 12px;
+    }
+  }
+
+  // show the league offset when hovering or if the overall row or if the current player
+  &:hover,
+  tr.row-0 &,
+  .current-player & {
+    .league-offset {
+      display: block;
+    }
+  }
+}
+
+.summoner-champion {
+  position: relative;
+  width: 42px;
+
+  .summoner-champion-icon {
+    width: 42px;
+  }
+
+  .summoner-champion-level {
+    position: absolute;
+    bottom: 1px;
+    left: 2px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    font-size: 12px;
+    line-height: 12px;
+  }
+}
+
+.summoner-spell-book {
+  width: 20px;
+  height: 42px;
+
+  .summoner-spell-icon {
+    display: block;
+    margin-top: 2px;
+    width: 20px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+.summoner-champion-spell-group {
+  .group;
+  margin: 0 auto;
+  width: 64px;
+
+  .summoner-champion {
+    float: left;
+  }
+
+  .summoner-spell-book {
+    float: left;
+    margin-left: 2px;
+  }
+}
+
+// matches
+.stat-score,
+.stat-minions {
+  white-space: nowrap;
+  line-height: 1em;
+
+  .icon {
+    display: inline-block;
+    margin-right: 2px;
+    vertical-align: middle;
+  }
+  .value {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+  }
+}
+
+.stat-score {
+  .icon {
+    background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/score.png');
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    width: 14px;
+    height: 14px;
+  }
+  .value {
+    letter-spacing: 1px;
+  }
+}
+.stat-minions {
+  .icon {
+    background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/minion.png');
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    width: 15px;
+    height: 17px;
+  }
+}
+.popover-nowrap {
+  white-space: nowrap;
+}
+
+.match-stats {
+  .summoner-name {
+    margin-top: 2px;
+  }
+  .summoner-stats {
+
+  }
+}
+
+.match {
+  background: #fff;
+  margin-top: 5px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  .match-summary {
+    cursor: pointer;
+
+    > div {
+      display: table;
+      width: 100%;
+      border-top: 1px solid #ccc;
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 10px;
+
+      &:hover {
+        background: #eee;
+        border-color: #aaa;
+      }
+    }
+
+    &.victory {
+      border-left: 10px solid rgb(99, 192, 99);
+    }
+    &.defeat {
+      border-left: 10px solid rgb(166, 57, 53);
+    }
+
+    .match-summary-section {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    .summoner-champion-container {
+      width: 60px;
+
+      .summoner-champion {
+
+        .summoner-champion-icon {
+          width: 60px;
+        }
+
+        .summoner-champion-level {
+          font-size: 14px;
+          line-height: 14px;
+          bottom: 2px;
+          left: 3px;
+        }
+      }
+    }
+
+    .summoner-spell-book-container {
+      width: 29px;
+      padding-left: 2px;
+
+      .summoner-spell-book {
+        width: 29px;
+        height: 60px;
+
+        .summoner-spell-icon {
+          width: 29px;
+        }
+      }
+      .summoner-name {
+        display: none;
+      }
+    }
+
+    .summoner-stats-container {
+      padding-left: 20px;
+      width: 120px;
+      padding-top: 9px;
+      text-align: left;
+
+      .summoner-stats {
+
+        .stat-score,
+        .stat-minions {
+          .icon {
+            width: 18px;
+            height: 21px;
+            background-size: 30px 30px;
+          }
+          .value {
+            font-size: 15px;
+            line-height: 15px;
+          }
+        }
+      }
+    }
+
+    .summoner-items-container {
+      width: 271px;
+      padding-left: 20px;
+
+      .summoner-items {
+
+        .summoner-item {
+          float: left;
+          margin-left: 1px;
+          vertical-align: middle;
+
+          &:first-child {
+            margin-left: 0;
+          }
+
+          img {
+            width: 35px;
+            height: 35px;
+          }
+          .empty-slot {
+            width: 35px;
+            height: 35px;
+            background: rgba(0, 0, 0, .1);
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, .5) rgba(255, 255, 255, .5) rgba(255, 255, 255, .5) rgba(0, 0, 0, .5)
+          }
+        }
+      }
+    }
+
+    .league-decorator-container {
+      text-align: left;
+      padding-left: 20px;
+
+      .league-decorator {
+        .league-icon {
+          height: 40px;
+        }
+
+        .league-offset {
+          display: block;
+          margin-left: 52px;
+
+          .league-offset-icon {
+            font-size: 16px;
+            margin-left: -3px;
+          }
+          &.played-up {
+            .league-offset-icon {
+              top: -10px;
+            }
+          }
+          &.played-down {
+            .league-offset-icon {
+              bottom: -10px;
+            }
+          }
+          .league-offset-value {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    .match-info-container {
+      text-align: right;
+      white-space: nowrap;
+      width: 1px;
+      padding-left: 20px;
+    }
+  }
+
+  .match-stats {
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
+}
+
+.show-more-container {
+  margin-top: 10px;
+  padding: 10px;
+}
+
+
+.overall-performance,
+.highlights-and-tips {
+  text-align: left;
+  height: 261px;
+
+  .loading {
+    line-height: 200px;
+    text-align: center;
+    font-size: 24px;
+  }
+
+  h2 {
+    margin: 0;
+    margin-bottom: 5px;
+    font-size: 18px;
+    line-height: 18px;
+    text-align: left;
+
+    .loading {
+      float: right;
+      font-size: 12px;
+      line-height: 18px;
+    }
+  }
+}
+
+.overall-performance {
+  .league-performance {
+    margin-top: 15px;
+    padding-left: 15px;
+    opacity: .5;
+
+    &.has-percent {
+      opacity: 1;
+    }
+
+    .percent-bar {
+      position: relative;
+      height: 14px;
+      border-radius: 4px;
+      text-align: left;
+      background: #000;
+      transition: width 1s;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      .percent-bar-color {
+        width: 100%;
+        height: 14px;
+        border-radius: 3px;
+        border: 1px solid #666;
+      }
+
+      .league-icon {
+        width: 30px;
+        position: absolute;
+        top: 50%;
+        margin-top: -14px;
+        left: -15px;
+      }
+
+      .percent-value {
+        position: absolute;
+        height: 26px;
+        line-height: 26px;
+        top: 50%;
+        margin-top: -13px;
+        font-family: 'Open Sans','Lato',Segoe,"Segoe UI",Candara,Calibri,Helvetica,AppleSDGothic,"Apple SD Gothic Neo",AppleGothic,Dotumche,Gulimche,Arial,Tahoma,sans-serif,'Dotum';
+        color: #fff;
+        text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+        font-weight: bold;
+        left: 20px;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.highlights-and-tips {
+  .highlight-average {
+    text-align: center;
   }
 }

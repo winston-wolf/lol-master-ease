@@ -1,5 +1,15 @@
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 body {
   background: #fff;
+}
+#preload-images {
+  top: -9999px;
+  left: -9999px;
+  position: absolute;
 }
 .gradient-background {
   background: #4488c4;
@@ -67,10 +77,7 @@ body {
   font-size: 10px;
   padding-top: 10px;
 }
-.league-icon {
-  width: 35px;
-}
-.my-stats {
+.matches {
   padding-top: 35px;
   padding-bottom: 40px;
   text-align: center;
@@ -81,10 +88,11 @@ body {
   margin-bottom: 0;
 }
 table.table-stats {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
   background: #fff;
+  margin-bottom: 0;
+}
+table.table-stats tr:first-child td {
+  border-top: 0;
 }
 table.table-stats tr.header td.team-blue,
 table.table-stats tr.header td.team-red {
@@ -159,4 +167,366 @@ table.table-stats td.expandable {
 }
 table.table-stats td.expandable.expand {
   display: table-cell;
+}
+.player-link {
+  line-height: 1em;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 85px;
+  display: inline-block;
+  overflow: hidden;
+}
+.league-decorator {
+  position: relative;
+  display: inline-block;
+}
+.league-decorator .league-icon {
+  height: 30px;
+}
+.league-decorator .league-offset {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-left: 36px;
+  margin-top: -15px;
+  font-weight: bold;
+}
+.league-decorator .league-offset.played-up {
+  color: #3c763d;
+}
+.league-decorator .league-offset.played-up .league-offset-icon {
+  top: -8px;
+  left: 50%;
+  margin-left: -2px;
+}
+.league-decorator .league-offset.played-down {
+  color: #a94442;
+}
+.league-decorator .league-offset.played-down .league-offset-icon {
+  bottom: -8px;
+  left: 50%;
+  margin-left: -2px;
+}
+.league-decorator .league-offset.played-normal {
+  color: #888;
+}
+.league-decorator .league-offset.played-up .league-offset-icon,
+.league-decorator .league-offset.played-down .league-offset-icon {
+  position: absolute;
+}
+.league-decorator .league-offset .league-offset-value,
+.league-decorator .league-offset .league-offset-icon {
+  float: left;
+  line-height: 30px;
+}
+.league-decorator .league-offset .league-offset-value {
+  margin-left: 2px;
+  font-size: 14px;
+}
+.league-decorator .league-offset .league-offset-icon {
+  font-size: 12px;
+}
+.league-decorator:hover .league-offset,
+tr.row-0 .league-decorator .league-offset,
+.current-player .league-decorator .league-offset {
+  display: block;
+}
+.summoner-champion {
+  position: relative;
+  width: 42px;
+}
+.summoner-champion .summoner-champion-icon {
+  width: 42px;
+}
+.summoner-champion .summoner-champion-level {
+  position: absolute;
+  bottom: 1px;
+  left: 2px;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+  font-size: 12px;
+  line-height: 12px;
+}
+.summoner-spell-book {
+  width: 20px;
+  height: 42px;
+}
+.summoner-spell-book .summoner-spell-icon {
+  display: block;
+  margin-top: 2px;
+  width: 20px;
+}
+.summoner-spell-book .summoner-spell-icon:first-child {
+  margin-top: 0;
+}
+.summoner-champion-spell-group {
+  margin: 0 auto;
+  width: 64px;
+}
+.summoner-champion-spell-group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.summoner-champion-spell-group .summoner-champion {
+  float: left;
+}
+.summoner-champion-spell-group .summoner-spell-book {
+  float: left;
+  margin-left: 2px;
+}
+.stat-score,
+.stat-minions {
+  white-space: nowrap;
+  line-height: 1em;
+}
+.stat-score .icon,
+.stat-minions .icon {
+  display: inline-block;
+  margin-right: 2px;
+  vertical-align: middle;
+}
+.stat-score .value,
+.stat-minions .value {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 12px;
+}
+.stat-score .icon {
+  background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/score.png');
+  background-repeat: no-repeat;
+  background-size: 24px 24px;
+  width: 14px;
+  height: 14px;
+}
+.stat-score .value {
+  letter-spacing: 1px;
+}
+.stat-minions .icon {
+  background-image: url('http://ddragon.leagueoflegends.com/cdn/5.5.1/img/ui/minion.png');
+  background-repeat: no-repeat;
+  background-size: 24px 24px;
+  width: 15px;
+  height: 17px;
+}
+.popover-nowrap {
+  white-space: nowrap;
+}
+.match-stats .summoner-name {
+  margin-top: 2px;
+}
+.match {
+  background: #fff;
+  margin-top: 5px;
+}
+.match:first-child {
+  margin-top: 0;
+}
+.match .match-summary {
+  cursor: pointer;
+}
+.match .match-summary > div {
+  display: table;
+  width: 100%;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+.match .match-summary > div:hover {
+  background: #eee;
+  border-color: #aaa;
+}
+.match .match-summary.victory {
+  border-left: 10px solid #63c063;
+}
+.match .match-summary.defeat {
+  border-left: 10px solid #a63935;
+}
+.match .match-summary .match-summary-section {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: left;
+}
+.match .match-summary .summoner-champion-container {
+  width: 60px;
+}
+.match .match-summary .summoner-champion-container .summoner-champion .summoner-champion-icon {
+  width: 60px;
+}
+.match .match-summary .summoner-champion-container .summoner-champion .summoner-champion-level {
+  font-size: 14px;
+  line-height: 14px;
+  bottom: 2px;
+  left: 3px;
+}
+.match .match-summary .summoner-spell-book-container {
+  width: 29px;
+  padding-left: 2px;
+}
+.match .match-summary .summoner-spell-book-container .summoner-spell-book {
+  width: 29px;
+  height: 60px;
+}
+.match .match-summary .summoner-spell-book-container .summoner-spell-book .summoner-spell-icon {
+  width: 29px;
+}
+.match .match-summary .summoner-spell-book-container .summoner-name {
+  display: none;
+}
+.match .match-summary .summoner-stats-container {
+  padding-left: 20px;
+  width: 120px;
+  padding-top: 9px;
+  text-align: left;
+}
+.match .match-summary .summoner-stats-container .summoner-stats .stat-score .icon,
+.match .match-summary .summoner-stats-container .summoner-stats .stat-minions .icon {
+  width: 18px;
+  height: 21px;
+  background-size: 30px 30px;
+}
+.match .match-summary .summoner-stats-container .summoner-stats .stat-score .value,
+.match .match-summary .summoner-stats-container .summoner-stats .stat-minions .value {
+  font-size: 15px;
+  line-height: 15px;
+}
+.match .match-summary .summoner-items-container {
+  width: 271px;
+  padding-left: 20px;
+}
+.match .match-summary .summoner-items-container .summoner-items .summoner-item {
+  float: left;
+  margin-left: 1px;
+  vertical-align: middle;
+}
+.match .match-summary .summoner-items-container .summoner-items .summoner-item:first-child {
+  margin-left: 0;
+}
+.match .match-summary .summoner-items-container .summoner-items .summoner-item img {
+  width: 35px;
+  height: 35px;
+}
+.match .match-summary .summoner-items-container .summoner-items .summoner-item .empty-slot {
+  width: 35px;
+  height: 35px;
+  background: rgba(0, 0, 0, 0.1);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.5);
+}
+.match .match-summary .league-decorator-container {
+  text-align: left;
+  padding-left: 20px;
+}
+.match .match-summary .league-decorator-container .league-decorator .league-icon {
+  height: 40px;
+}
+.match .match-summary .league-decorator-container .league-decorator .league-offset {
+  display: block;
+  margin-left: 52px;
+}
+.match .match-summary .league-decorator-container .league-decorator .league-offset .league-offset-icon {
+  font-size: 16px;
+  margin-left: -3px;
+}
+.match .match-summary .league-decorator-container .league-decorator .league-offset.played-up .league-offset-icon {
+  top: -10px;
+}
+.match .match-summary .league-decorator-container .league-decorator .league-offset.played-down .league-offset-icon {
+  bottom: -10px;
+}
+.match .match-summary .league-decorator-container .league-decorator .league-offset .league-offset-value {
+  font-size: 18px;
+}
+.match .match-summary .match-info-container {
+  text-align: right;
+  white-space: nowrap;
+  width: 1px;
+  padding-left: 20px;
+}
+.match .match-stats {
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.show-more-container {
+  margin-top: 10px;
+  padding: 10px;
+}
+.overall-performance,
+.highlights-and-tips {
+  text-align: left;
+  height: 261px;
+}
+.overall-performance .loading,
+.highlights-and-tips .loading {
+  line-height: 200px;
+  text-align: center;
+  font-size: 24px;
+}
+.overall-performance h2,
+.highlights-and-tips h2 {
+  margin: 0;
+  margin-bottom: 5px;
+  font-size: 18px;
+  line-height: 18px;
+  text-align: left;
+}
+.overall-performance h2 .loading,
+.highlights-and-tips h2 .loading {
+  float: right;
+  font-size: 12px;
+  line-height: 18px;
+}
+.overall-performance .league-performance {
+  margin-top: 15px;
+  padding-left: 15px;
+  opacity: .5;
+}
+.overall-performance .league-performance.has-percent {
+  opacity: 1;
+}
+.overall-performance .league-performance .percent-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 4px;
+  text-align: left;
+  background: #000;
+  transition: width 1s;
+}
+.overall-performance .league-performance .percent-bar:first-child {
+  margin-top: 0;
+}
+.overall-performance .league-performance .percent-bar .percent-bar-color {
+  width: 100%;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid #666;
+}
+.overall-performance .league-performance .percent-bar .league-icon {
+  width: 30px;
+  position: absolute;
+  top: 50%;
+  margin-top: -14px;
+  left: -15px;
+}
+.overall-performance .league-performance .percent-bar .percent-value {
+  position: absolute;
+  height: 26px;
+  line-height: 26px;
+  top: 50%;
+  margin-top: -13px;
+  font-family: 'Open Sans', 'Lato', Segoe, "Segoe UI", Candara, Calibri, Helvetica, AppleSDGothic, "Apple SD Gothic Neo", AppleGothic, Dotumche, Gulimche, Arial, Tahoma, sans-serif, 'Dotum';
+  color: #fff;
+  text-shadow: -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000, 1px 1px 0 #000000;
+  font-weight: bold;
+  left: 20px;
+  white-space: nowrap;
+}
+.highlights-and-tips .highlight-average {
+  text-align: center;
 }
