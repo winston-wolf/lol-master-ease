@@ -96,6 +96,10 @@ class Connection(object):
     def escape(*args, **kwargs):
         return util_mysql.escape(*args, **kwargs)
 
+def close_connections():
+    global database_connections
+    for id, connection in database_connections.items():
+	connection.close()
 
 # Handles
 database_connections = {}

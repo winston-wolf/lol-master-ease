@@ -3,7 +3,7 @@ from flask.ext.restful import reqparse, abort
 from flask import Blueprint
 from time import sleep
 
-from db import get_connection
+from db import get_connection, close_connections
 from settings import API_URL_SUMMONER_SEARCH, API_URL_MATCH_HISTORY, API_URL_MATCH
 from settings import SEASON_NAME, RANK_TIERS, MATCHES_PER_PAGE, PLATFORM_IDS
 from settings import DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME
@@ -648,6 +648,8 @@ class Matches(restful.Resource):
 
             matches.append(match)
 
+        close_connections()
+
         return {
             'page': page,
             'matches': matches,
@@ -671,6 +673,8 @@ class MatchStats(restful.Resource):
 
         # get the stats
         match_stats = db_get_match_stats(match_id, region, summoner)
+
+        close_connections()
 
         return {
             'stats': match_stats,
@@ -815,6 +819,8 @@ class MatchesStats(restful.Resource):
         summoner = get_summoner(region, summoner_name)
 
         aggregate_stats = db_get_matches_stats(region, summoner)
+
+        close_connections()
 
         return {
             'stats': aggregate_stats,
