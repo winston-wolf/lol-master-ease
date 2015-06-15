@@ -50,12 +50,18 @@ class Request(object):
         return self._response[1]
 
 def request(url, region, type='GET', retry_count=0, **kwargs):
+    kwargs_formatted = {}
+    for k,v in kwargs.items():
+        if isinstance(v, unicode):
+            v = v.encode('utf-8')
+        kwargs_formatted[k] = v
+
     response = connection_pool_dict[region].request(
         type,
         url.format(
             region=region,
             apiKey=API_KEY,
-            **kwargs
+            **kwargs_formatted
         ),
         timeout=10.0
     )
