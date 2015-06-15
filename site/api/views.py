@@ -66,11 +66,11 @@ def get_summoner(region, summoner_name):
     )
 
     summoner = database.fetch_one_dict(sql)
-    logger.warning('[get_summoner] summoner: {} with sql {}'.format(summoner, sql))
+    logger.warning(u'[get_summoner] summoner: {} with sql {}'.format(summoner, sql))
 
     if not summoner:
         try:
-            logger.warning('[get_summoner] adding request for summoner {}'.format(summoner_name))
+            logger.warning(u'[get_summoner] adding request for summoner {}'.format(summoner_name))
             response = request(API_URL_SUMMONER_SEARCH, region, summonerName=summoner_name)
 
             if response is None:
@@ -86,7 +86,7 @@ def get_summoner(region, summoner_name):
                 'can_refresh': True,
             }
         except Exception as e:
-            logger.warning('[get_summoner] Exception: {}'.format(e))
+            logger.warning(u'[get_summoner] Exception: {}'.format(e))
             return False
 
     return summoner
@@ -98,7 +98,7 @@ def find_match_ids(region, summoner, begin_index, end_index):
 
     # if loading the first page and a refresh is possible, pull new data from the api
     if begin_index == 0 and summoner['can_refresh']:
-        logger.warning('[find_match_ids] getting api matches')
+        logger.warning(u'[find_match_ids] getting api matches')
         api_pull_match_history(region, summoner, begin_index)
 
         # update the last refresh datetime since we just refreshed
@@ -384,7 +384,7 @@ def db_get_match_stats(match_id, region, summoner):
             players_ranked_sum += rank_id
             players_ranked_total += 1
 
-    average_rank = int(round(float(players_ranked_sum) / players_ranked_total))
+    average_rank = int(round(float(players_ranked_sum) / players_ranked_total)) if players_ranked_total else 2 # silver
     for player_game in player_game_data:
         stats_players.append({
             'summoner_champion': {
