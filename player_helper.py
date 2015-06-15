@@ -23,8 +23,10 @@ def get_stats(match_stats, database):
     platform = match_stats[0]['match']['platform']
     for match_stat in match_stats:
         _region = match_stat['match']['region']
-        if not _region == region:
-            raise Exception('Cross region match pulling not supported')
+        # Theoretically this should work out OK
+        # Each region has its own set of summoner IDs
+        # if not _region == region:
+        #     raise Exception('Cross region match pulling not supported')
         for player in match_stat['players']:
             summoner_id = player['id']
             if not summoner_id in players:
