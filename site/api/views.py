@@ -713,15 +713,15 @@ def db_get_matches_stats(region, summoner):
                         q1.summoner_kills,
                         q1.summoner_champion_level,
 
-                        CEIL((q1.cs - afd.average_cs) / afd.freelo_dev_cs) AS tier_diff_cs,
-                        CEIL((q1.vision_wards_placed - afd.average_vision_wards_placed) / afd.freelo_dev_vision_wards_placed) AS tier_diff_vision_wards_placed,
-                        CEIL((q1.assists - afd.average_assists) / afd.freelo_dev_assists) AS tier_diff_assists,
-                        CEIL((q1.deaths - afd.average_deaths) / afd.freelo_dev_deaths) AS tier_diff_deaths,
-                        CEIL((q1.kills - afd.average_kills) / afd.freelo_dev_kills) AS tier_diff_kills,
-                        CEIL((q1.sight_wards_placed - afd.average_sight_wards_placed) / afd.freelo_dev_sight_wards_placed) AS tier_diff_sight_wards_placed,
-                        GREATEST(IFNULL(CEIL((q1.team_first_dragon_kill_time_in_minutes - afd.average_cs_first_dragon_time_in_minutes) / afd.freelo_dev_first_dragon_time_in_minutes), -3), -3) AS tier_diff_team_first_dragon_kill_time_in_minutes,
-                        CEIL((q1.match_total_time_in_minutes - afd.average_match_time_in_minutes) / afd.freelo_dev_match_time_in_minutes) AS tier_diff_match_time_in_minutes,
-                        CEIL((q1.damage_done_to_champions - afd.average_damage_done_to_champions) / afd.freelo_dev_damage_done_to_champions) AS tier_diff_damage_done_to_champions
+                        LEAST(ROUND((q1.cs - afd.average_cs) / afd.freelo_dev_cs, 0), 7) AS tier_diff_cs,
+                        LEAST(ROUND((q1.vision_wards_placed - afd.average_vision_wards_placed) / afd.freelo_dev_vision_wards_placed, 0), 7) AS tier_diff_vision_wards_placed,
+                        LEAST(ROUND((q1.assists - afd.average_assists) / afd.freelo_dev_assists, 0), 7) AS tier_diff_assists,
+                        LEAST(ROUND((q1.deaths - afd.average_deaths) / afd.freelo_dev_deaths, 0), 7) AS tier_diff_deaths,
+                        LEAST(ROUND((q1.kills - afd.average_kills) / afd.freelo_dev_kills, 0), 7) AS tier_diff_kills,
+                        LEAST(ROUND((q1.sight_wards_placed - afd.average_sight_wards_placed) / afd.freelo_dev_sight_wards_placed, 0), 7) AS tier_diff_sight_wards_placed,
+                        GREATEST(IFNULL(ROUND((q1.team_first_dragon_kill_time_in_minutes - afd.average_cs_first_dragon_time_in_minutes) / afd.freelo_dev_first_dragon_time_in_minutes, 0), -3), -3) AS tier_diff_team_first_dragon_kill_time_in_minutes,
+                        LEAST(ROUND((q1.match_total_time_in_minutes - afd.average_match_time_in_minutes) / afd.freelo_dev_match_time_in_minutes, 0), 7) AS tier_diff_match_time_in_minutes,
+                        LEAST(ROUND((q1.damage_done_to_champions - afd.average_damage_done_to_champions) / afd.freelo_dev_damage_done_to_champions, 0), 7) AS tier_diff_damage_done_to_champions
                 FROM
                     (
                         SELECT
