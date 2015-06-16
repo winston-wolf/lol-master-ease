@@ -1,3 +1,5 @@
+gunicorn
 flask
-tornado
-requests
+flask-restful
+MySQL-python
+blinker
