@@ -154,8 +154,6 @@ App.MatchesRoute = Ember.Route.extend({
 
     },
     model: function(params) {
-        console.log('running model thingy');
-
         var self = this,
             controller = this.controllerFor('matches');
 
