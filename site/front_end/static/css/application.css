@@ -460,7 +460,7 @@ tr.row-0 .league-decorator .league-offset,
 .overall-performance,
 .highlights-and-tips {
   text-align: left;
-  height: 261px;
+  margin: 10px 0;
 }
 .overall-performance .loading,
 .highlights-and-tips .loading {

@@ -98,9 +98,9 @@
                         {{/if}}
 
                         {{#if matches}}
-                            <div class="row aggregate_analysis">
+                            <div class="row well aggregate_analysis">
                                 <div class="col-md-6">
-                                    <div class="overall-performance well">
+                                    <div class="overall-performance">
                                         <h2>Performance Over Latest {{aggregate_analysis.games_loaded}} Games{{#if aggregate_analysis.games_loading}}<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading {{aggregate_analysis.games_loading}} more {{pluralize 'game' value=aggregate_analysis.games_loading}}...</div>{{/if}}</h2>
                                         <div class="league-performance {{if aggregate_analysis.overall_league_counts.challenger 'has-percent'}}">
                                             <div class="percent-bar" style="width: {{percent_width aggregate_analysis.overall_league_counts.challenger total=aggregate_analysis.games_loaded}}%;">
@@ -155,7 +155,7 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <div class="highlights-and-tips well">
+                                    <div class="highlights-and-tips">
                                         <h2>Highlights & Tips</h2>
                                         {{#if aggregate_analysis.games_loading}}
                                             <div class="loading"><i class="fa fa-spinner fa-spin"></i> Analyzing games...</div>
