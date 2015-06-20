@@ -413,7 +413,7 @@ def insert(match_stats, player_stats, database, detailed=False):
 
         database.execute(sql)
 
-    if detailed:
+    if detailed and False:  # disabled match frame data from being recorded for now
         # ---------------------------------------------------- #
         # Frame Insertion
         # ---------------------------------------------------- #

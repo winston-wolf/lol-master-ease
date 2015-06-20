@@ -510,7 +510,7 @@ def api_pull_match(match_id, region):
 
         if match and 'timeline' in match:
             logger.warning('doing match_helper.get_stats()')
-            match_stats = [match_helper.get_stats(match, detailed=False)] # Detailed removed
+            match_stats = [match_helper.get_stats(match, detailed=True)]
 
             if match_stats:
                 logger.warning('doing player_helper.get_stats()')
@@ -522,7 +522,7 @@ def api_pull_match(match_id, region):
                 for match_stat in match_stats:
                     try:
                         logger.warning('inserting match')
-                        match_helper.insert(match_stat, player_stats, database, detailed=False) # Detailed Removed
+                        match_helper.insert(match_stat, player_stats, database, detailed=True)
                     except Exception:
                         pass
 
