@@ -1,4 +1,4 @@
-gunicorn
+git+https://github.com/benoitc/gunicorn.git
 flask
 flask-restful
 MySQL-python
