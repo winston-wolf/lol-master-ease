@@ -148,6 +148,36 @@ App.LeagueDecoratorComponent = Ember.Component.extend({
     }.on('willInsertElement')
 });
 
+// champion filter
+var champion_filter_typeahead = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    identify: function(obj) { return obj.name; },
+    prefetch: '/front_end/data/champions.json'
+});
+App.ChampionFilterComponent = Ember.Component.extend({
+    setup: function() {
+        var self = this;
+
+        $('#champion-filter .typeahead').typeahead(null, {
+            name: 'champion-filter',
+            display: 'name',
+            source: champion_filter_typeahead,
+            templates: {
+                empty: [
+                    '<div class="empty-message">',
+                    '   Sorry, we couldn\'t find that champion.',
+                    '</div>'
+                ].join('\n'),
+                suggestion: Handlebars.compile('<div><img src="{{image_icon_url}}" /><span>{{name}}</span></div>')
+            }
+        })
+        .on('typeahead:select', function(e, suggestion) {
+            self.sendAction('selected_action', suggestion);
+        });
+    }.on('didInsertElement')
+});
+
 // toggle match stats view
 App.ToggleMatchStatsView = Ember.View.extend({
     click: function(e) {

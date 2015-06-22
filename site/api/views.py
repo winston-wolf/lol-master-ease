@@ -93,13 +93,13 @@ def get_summoner(region, summoner_name):
 
 
 # gets match ids based on begin and end index and fetches more from the api if needed
-def find_match_ids(region, summoner, begin_index, end_index):
+def find_match_ids(region, summoner, begin_index, end_index, champion_id=0):
     database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
 
     # if loading the first page and a refresh is possible, pull new data from the api
     if begin_index == 0 and summoner['can_refresh']:
         logger.warning(u'[find_match_ids] getting api matches')
-        api_pull_match_history(region, summoner, begin_index)
+        api_pull_match_history(region, summoner, begin_index, champion_id=champion_id)
 
         # update the last refresh datetime since we just refreshed
         sql = u"""
@@ -117,22 +117,26 @@ def find_match_ids(region, summoner, begin_index, end_index):
         database.execute(sql)
 
     # try getting match ids
-    match_ids = db_get_match_ids(region, summoner, begin_index, end_index)
+    match_ids = db_get_match_ids(region, summoner, begin_index, end_index, champion_id=champion_id)
     logger.warning('[find_match_ids] db_get_match_ids FIRST TRY got {}'.format(match_ids))
 
     # if not the first page and no matches were found, try pulling new ones from the api
     if (begin_index > 0 and not match_ids) or len(match_ids) < MATCHES_PER_PAGE:
         logger.warning('[find_match_ids] getting api matches 2')
-        api_pull_match_history(region, summoner, begin_index)
-        match_ids = db_get_match_ids(region, summoner, begin_index, end_index)
+        api_pull_match_history(region, summoner, begin_index, champion_id=champion_id)
+        match_ids = db_get_match_ids(region, summoner, begin_index, end_index, champion_id=champion_id)
         logger.warning('[find_match_ids] db_get_match_ids SECOND TRY got {}'.format(match_ids))
 
     return match_ids
 
 
 # performs the query to find match ids
-def db_get_match_ids(region, summoner, begin_index, end_index):
+def db_get_match_ids(region, summoner, begin_index, end_index, champion_id=0):
     database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
+
+    champion_filter_sql = u''
+    if champion_id:
+        champion_filter_sql = u'AND summoner_champion_id={}'.format(champion_id)
 
     sql = u"""
         SELECT
@@ -142,6 +146,7 @@ def db_get_match_ids(region, summoner, begin_index, end_index):
         WHERE 1
             AND match_region = {region}
             AND summoner_id = {summoner_id}
+            {champion_filter_sql}
             {missing_item_temp_fix_sql}
         ORDER BY
             match_create_datetime DESC
@@ -152,6 +157,7 @@ def db_get_match_ids(region, summoner, begin_index, end_index):
         summoner_id=summoner['id'],
         limit=(end_index - begin_index),
         offset=begin_index,
+        champion_filter_sql=champion_filter_sql,
         missing_item_temp_fix_sql=MISSING_ITEM_TEMP_FIX_SQL,
     )
 
@@ -424,15 +430,19 @@ def db_get_match_stats(match_id, region, summoner):
 
 
 # fetches api matches and stores the ones not yet stored
-def api_pull_match_history(region, summoner, begin_index):
+def api_pull_match_history(region, summoner, begin_index, champion_id=0):
     database = get_connection(DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME)
+
+    champion_filter_sql = u''
+    if champion_id:
+        champion_filter_sql = u'AND summoner_champion_id={}'.format(champion_id)
 
     # always try getting 15 matches (max) at a time
     end_index = begin_index + 15
 
     # fetch matches from the api
     logger.warning('[api_pull_match_history] adding request for match history of {}'.format(summoner['id']))
-    response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index)
+    response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index, championId=champion_id)
 
     if response:
         logger.warning('[api_pull_match_history] got {} matches: [{}]'.format(len(response.get('matches', [])), [str(match['matchId']) for match in response.get('matches', [])]))
@@ -448,11 +458,13 @@ def api_pull_match_history(region, summoner, begin_index):
                     AND match_region = {region}
                     AND summoner_id = {summoner_id}
                     AND match_id IN ({match_ids})
+                    {champion_filter_sql}
                     {missing_item_temp_fix_sql}
                 """.format(
                     region=database.escape(region),
                     summoner_id=summoner['id'],
                     match_ids=','.join(str(match['matchId']) for match in matches),
+                    champion_filter_sql=champion_filter_sql,
                     missing_item_temp_fix_sql=MISSING_ITEM_TEMP_FIX_SQL,
                 )
             recorded_match_ids = database.fetch_all_value(sql)
@@ -536,9 +548,11 @@ class Matches(restful.Resource):
         parser.add_argument('region', type=str_trimmed, required=True)
         parser.add_argument('summoner_name', type=str_trimmed, required=True)
         parser.add_argument('page', type=int)
+        parser.add_argument('champion_id', type=int)
         args = parser.parse_args()
         region = args['region'].lower()
         summoner_name = args['summoner_name'].replace(' ', '').lower()
+        champion_id = args['champion_id']
         page = args['page']
         if not page:
             page = 1
@@ -553,7 +567,7 @@ class Matches(restful.Resource):
             abort(404, error_key='SUMMONER_NOT_FOUND')
 
         # find match ids
-        match_ids = find_match_ids(region, summoner, begin_index, end_index)
+        match_ids = find_match_ids(region, summoner, begin_index, end_index, champion_id=champion_id)
         logger.warning('going to ultimately pull: {}'.format(match_ids))
 
         sql = u"""
@@ -585,6 +599,7 @@ class Matches(restful.Resource):
             LEFT JOIN summoners s ON m.summoner_id = s.id AND m.match_region = s.region
             WHERE 1
                 AND m.match_region = {}
+                AND m.match_id IN ({})
                 AND m.summoner_id = {}
             GROUP BY
                 m.match_id
@@ -594,6 +609,7 @@ class Matches(restful.Resource):
             OFFSET {}
         """.format(
             database.escape(region),
+            ','.join([str(match_id) for match_id in match_ids]),
             summoner['id'],
             (end_index - begin_index),
             begin_index,

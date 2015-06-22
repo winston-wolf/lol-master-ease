@@ -97,8 +97,10 @@
                             {{/if}}
                         {{/if}}
 
+                        {{champion-filter selected_action="filter_champion"}}
+
                         {{#if matches}}
-                            <div class="row well aggregate_analysis">
+                            <div class="row well aggregate-analysis">
                                 <div class="col-md-6">
                                     <div class="overall-performance">
                                         <h2>Performance Over Latest {{aggregate_analysis.games_loaded}} Games{{#if aggregate_analysis.games_loading}}<div class="loading"><i class="fa fa-spinner fa-spin"></i> Loading {{aggregate_analysis.games_loading}} more {{pluralize 'game' value=aggregate_analysis.games_loading}}...</div>{{/if}}</h2>
@@ -166,8 +168,6 @@
                                 </div>
 
                             </div>
-
-                            <h2>Latest Ranked Solo Queue Games</h2>
                         {{/if}}
 
                         {{#each matches as |match|}}
@@ -254,6 +254,12 @@
                         {{/if}}
                     {{/if}}
                 </div>
+            </div>
+        </script>
+
+        <script type="text/x-handlebars" data-template-name="components/champion-filter">
+            <div id="champion-filter">
+                <input class="typeahead form-control" type="text" placeholder="Champion filter...">
             </div>
         </script>
 
@@ -360,6 +366,8 @@
         <script src="/front_end/js/libs/ember.min.js"></script>
         <script src="/front_end/js/libs/ember-data.min.js"></script>
         <script src="/front_end/js/libs/ember-template-compiler.js"></script>
+        <!-- Other Libs -->
+        <script src="/front_end/js/libs/typeahead.bundle.min.js"></script>
         <!-- Util -->
         <script src="/front_end/js/util.js"></script>
         <!-- App -->
