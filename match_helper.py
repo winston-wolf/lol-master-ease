@@ -9,13 +9,16 @@
 from datetime import datetime
 import logging
 
-from settings import ITEM_TRINKET_PINK, ITEM_TRINKET_UPGRADES, MATCH_DELTA_TIMES
+from settings import ITEM_TRINKET_PINK, ITEM_TRINKET_UPGRADES, MATCH_DELTA_TIMES, API_URL_MATCH
+from request import request
 
 ITEM_TRINKET_UPGRADES_DICT = { _id: True for _id in ITEM_TRINKET_UPGRADES }
 
 logger = logging.getLogger('freelo')
 
-def get_stats(match, detailed=False):
+def get_stats(match=None, detailed=False, region=None, matchId=None):
+    if not match:
+        match = request(API_URL_MATCH, region, matchId=matchId, includeTimeline="true")
     match_total_time_in_minutes = int(float(match['matchDuration'])/60)
     match_stats = {
         "id": match['matchId'],

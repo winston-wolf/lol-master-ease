@@ -4,9 +4,10 @@ from flask import Blueprint
 from time import sleep
 
 from db import get_connection, close_connections
-from settings import API_URL_SUMMONER_SEARCH, API_URL_MATCH_HISTORY, API_URL_MATCH
+from settings import API_URL_SUMMONER_SEARCH, API_URL_MATCH_LIST, API_URL_MATCH
 from settings import SEASON_NAME, RANK_TIERS, MATCHES_PER_PAGE, PLATFORM_IDS
 from settings import DATABASE_HOST, DATABASE_PORT, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME
+from util import SimpleThread
 
 import player_helper
 import match_helper
@@ -432,7 +433,7 @@ def api_pull_match_history(region, summoner, begin_index):
 
     # fetch matches from the api
     logger.warning('[api_pull_match_history] adding request for match history of {}'.format(summoner['id']))
-    response = request(API_URL_MATCH_HISTORY, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index)
+    response = request(API_URL_MATCH_LIST, region, summonerId=summoner['id'], beginIndex=begin_index, endIndex=end_index)
 
     if response:
         logger.warning('[api_pull_match_history] got {} matches: [{}]'.format(len(response.get('matches', [])), [str(match['matchId']) for match in response.get('matches', [])]))
@@ -465,9 +466,11 @@ def api_pull_match_history(region, summoner, begin_index):
                 # if the match is not already recorded and in this season, then record it
                 if match['matchId'] not in recorded_match_ids and match['season'] == SEASON_NAME:
                     logger.warning('[api_pull_match_history] getting stats for match {}'.format(match['matchId']))
-                    match_stats.append(match_helper.get_stats(match, detailed=False))
+                    thread = SimpleThread(match_helper.get_stats, matchId=match['matchId'], region=region, detailed=False)
+                    match_stats.append(thread)
 
             if match_stats:
+                match_stats = [stats.result() for stats in match_stats]
                 logger.warning('[api_pull_match_history] doing player_helper.get_stats()')
                 player_stats = player_helper.get_stats(match_stats, database)
 
