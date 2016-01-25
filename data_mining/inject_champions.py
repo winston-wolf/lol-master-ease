@@ -80,6 +80,7 @@ def run():
     database.execute(insert_query)
 
     # save champion data to disk, too
+    json_values = sorted(json_values, key=lambda k: k['name'])  # sort alphabetically by champion name
     cur_dir = os.path.dirname(os.path.realpath(__file__))
     f = open('{}/../site/front_end/static/data/champions.json'.format(cur_dir), 'w')
     f.write(json.dumps(json_values))

@@ -25,7 +25,7 @@ App.MatchesController = Ember.ArrayController.extend({
 
         match.set('loading_stats', true);
 
-        jQuery.getJSON('/api/1.0/matches/'+match.get('match_id')+'/stats?region='+region+'&summoner_name='+summoner_name+'&champion_id='+champion_id).done(function(resp) {
+        jQuery.getJSON('/api/1.0/matches/'+match.get('match_id')+'/stats?region='+region+'&summoner_name='+summoner_name+'&champion_ids='+champion_id).done(function(resp) {
             match.set('stats', resp.stats);
             match.set('loading_stats', false);
 
@@ -92,7 +92,7 @@ App.MatchesController = Ember.ArrayController.extend({
             this.set('loading_more', true);
         }
 
-        return jQuery.getJSON('/api/1.0/matches?region='+region+'&summoner_name='+summoner_name+'&champion_id='+champion_id+'&page='+page).done(function(resp) {
+        return jQuery.getJSON('/api/1.0/matches?region='+region+'&summoner_name='+summoner_name+'&champion_ids='+champion_id+'&page='+page).done(function(resp) {
             var new_matches = [];
             var matches_needing_stats = [];
             for(var i=0, n=resp.matches.length; i<n; ++i) {
@@ -171,7 +171,7 @@ App.MatchesRoute = Ember.Route.extend({
         controller.set('loading', true);
         controller.set('region', params.region);
         controller.set('summoner_name', params.summoner_name);
-        controller.set('champion_id', 0);
+        controller.set('champion_id', '');
         controller.set('page', 0);
         controller.set('matches', []);
         this.store.unloadAll('match');

@@ -104,7 +104,10 @@ App.SummonerStatsComponent = Ember.Component.extend({
                     'Jungle: '+this.get('player.summoner_neutral_minions_killed') +
                 '</div>'
         });
-    }.on('didInsertElement')
+    }.on('didInsertElement'),
+    championIdsObserver: function() {
+        console.log('change?')
+    }.observes('champion_ids')
 });
 
 // summoner items
@@ -149,32 +152,24 @@ App.LeagueDecoratorComponent = Ember.Component.extend({
 });
 
 // champion filter
-var champion_filter_typeahead = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    identify: function(obj) { return obj.name; },
-    prefetch: '/front_end/data/champions.json'
-});
+var champions_json_promise = $.getJSON('/front_end/data/champions.json');
 App.ChampionFilterComponent = Ember.Component.extend({
     setup: function() {
         var self = this;
 
-        $('#champion-filter .typeahead').typeahead(null, {
-            name: 'champion-filter',
-            display: 'name',
-            source: champion_filter_typeahead,
-            templates: {
-                empty: [
-                    '<div class="empty-message">',
-                    '   Sorry, we couldn\'t find that champion.',
-                    '</div>'
-                ].join('\n'),
-                suggestion: Handlebars.compile('<div><img src="{{image_icon_url}}" /><span>{{name}}</span></div>')
-            }
+        champions_json_promise.done(function(champions) {
+            var $menu = $(self.element).find('.menu');
+
+            // add 'none' option to menu
+            $menu.append('<div class="item" data-value="">All</div>');
+
+            $.each(champions, function(champion_index, champion) {
+                $menu.append('<div class="item" data-value="'+champion['id']+'"><img src="'+champion['image_icon_url']+'" /> '+champion['name']+'</div>');
+            });
+
+            var $dropdown = $(self.element).find('.ui.dropdown');
+            $dropdown.dropdown();
         })
-        .on('typeahead:select', function(e, suggestion) {
-            self.sendAction('selected_action', suggestion);
-        });
     }.on('didInsertElement')
 });
 

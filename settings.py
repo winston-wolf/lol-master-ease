@@ -28,7 +28,7 @@ API_URL_CHAMPIONS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/cham
 API_URL_SUMMONER_SPELLS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/summoner-spell?spellData=image&api_key={apiKey}'
 API_URL_ITEMS = 'https://global.api.pvp.net/api/lol/static-data/na/v1.2/item?itemListData=image&api_key={apiKey}'
 API_URL_MATCH = 'https://{region}.api.pvp.net/api/lol/{region}/v2.2/match/{matchId}?includeTimeline={includeTimeline}&api_key={apiKey}'
-API_URL_MATCH_HISTORY = 'https://{region}.api.pvp.net/api/lol/{region}/v2.2/matchhistory/{summonerId}?rankedQueues=RANKED_SOLO_5x5&beginIndex={beginIndex}&endIndex={endIndex}&champion_id={championId}&api_key={apiKey}'
+API_URL_MATCH_HISTORY = 'https://{region}.api.pvp.net/api/lol/{region}/v2.2/matchhistory/{summonerId}?rankedQueues=RANKED_SOLO_5x5&beginIndex={beginIndex}&endIndex={endIndex}&championIds={championIds}&api_key={apiKey}'
 API_URL_LEAGUES_CHALLENGER = 'https://{region}.api.pvp.net/api/lol/{region}/v2.5/league/challenger?type=RANKED_SOLO_5x5&api_key={apiKey}'
 API_URL_LEAGUES_MASTER = 'https://{region}.api.pvp.net/api/lol/{region}/v2.5/league/master?type=RANKED_SOLO_5x5&api_key={apiKey}'
 API_URL_LEAGUES_RANK = 'https://{region}.api.pvp.net/api/lol/{region}/v2.5/league/by-summoner/{summonerId}/entry?api_key={apiKey}'

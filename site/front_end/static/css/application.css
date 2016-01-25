@@ -533,6 +533,7 @@ tr.row-0 .league-decorator .league-offset,
 .aggregate-analysis {
   margin-left: 0;
   margin-right: 0;
+  margin-top: 20px;
   padding: 5px;
 }
 .tt-menu {
@@ -555,4 +556,23 @@ tr.row-0 .league-decorator .league-offset,
 .tt-menu .tt-dataset .tt-suggestion span {
   display: inline-block;
   margin-left: 10px;
+}
+.ui.dropdown {
+  padding: 0 !important;
+}
+.ui.dropdown .icon.dropdown {
+  padding: 0 !important;
+  margin: 0 !important;
+  top: 50% !important;
+  margin-top: -7px !important;
+}
+.ui.dropdown .text,
+.ui.dropdown .item {
+  height: 3em;
+  line-height: 3em;
+  padding: 0 .8em;
+}
+.ui.dropdown .text img,
+.ui.dropdown .item img {
+  height: 25px;
 }

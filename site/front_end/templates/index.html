@@ -21,6 +21,9 @@
             <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
         <![endif]-->
 
+        <!-- Other Libs -->
+        <link rel="stylesheet" href="/front_end/css/semantic.min.css" />
+
         <!-- Font Awesome -->
         <link rel="stylesheet" href="/front_end/css/font-awesome.min.css" />
 
@@ -258,8 +261,15 @@
         </script>
 
         <script type="text/x-handlebars" data-template-name="components/champion-filter">
-            <div id="champion-filter">
-                <input class="typeahead form-control" type="text" placeholder="Champion filter...">
+            <div class="ui selection dropdown">
+                <input type="hidden" name="champion_ids" >
+                <i class="dropdown icon"></i>
+                <div class="default text">All</div>
+                <div class="menu">
+                    <div class="ui search input">
+                        {{input type="hidden" name="search" value=champion_ids placeholder="Search champions..."}}
+                    </div>
+                </div>
             </div>
         </script>
 
@@ -368,6 +378,7 @@
         <script src="/front_end/js/libs/ember-template-compiler.js"></script>
         <!-- Other Libs -->
         <script src="/front_end/js/libs/typeahead.bundle.min.js"></script>
+        <script src="/front_end/js/libs/semantic.min.js"></script>
         <!-- Util -->
         <script src="/front_end/js/util.js"></script>
         <!-- App -->
