@@ -43,7 +43,7 @@ MATCH_DELTA_TIMES = {
     'twentyToThirty': [20, 30],
     'thirtyToEnd': [30, None]
 }
-SEASON_NAME = 'SEASON2015'
+SEASON_NAME = 'SEASON2016'
 MATCHES_PER_PAGE = 15
 
 PLATFORM_IDS = {'na': 'NA1', 'ru': 'RU', 'br': 'BR1', 'oce': 'OC1', 'euw': 'EUW1', 'eune': 'EUN1', 'kr': 'KR', 'lan': 'LA1', 'las': 'LA2', 'tr': 'TR1'}

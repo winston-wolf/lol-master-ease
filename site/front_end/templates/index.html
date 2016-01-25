@@ -171,7 +171,7 @@
                         {{/if}}
 
                         {{#each matches as |match|}}
-                            <div class="match">
+                            <div class="match" data-match-id="{{match.id}}">
                                 <div class="match-summary {{if match.player.summoner_is_winner 'victory' 'defeat'}}">
                                     {{#view App.ToggleMatchStatsView match=match}}
                                         <div class="match-summary-section summoner-champion-container">{{summoner-champion player=match.player}}</div>
