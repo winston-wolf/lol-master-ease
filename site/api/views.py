@@ -141,6 +141,7 @@ def db_get_match_ids(region, summoner, begin_index, end_index):
         FROM
             matches
         WHERE 1
+            AND match_season = {match_season}
             AND match_region = {region}
             AND summoner_id = {summoner_id}
             {missing_item_temp_fix_sql}
@@ -149,6 +150,7 @@ def db_get_match_ids(region, summoner, begin_index, end_index):
         LIMIT {limit}
         OFFSET {offset}
     """.format(
+        match_season=database.escape(SEASON_NAME),
         region=database.escape(region),
         summoner_id=summoner['id'],
         limit=(end_index - begin_index),
@@ -587,6 +589,7 @@ class Matches(restful.Resource):
             LEFT JOIN items i6 ON i6.id = m.summoner_item_6_id
             LEFT JOIN summoners s ON m.summoner_id = s.id AND m.match_region = s.region
             WHERE 1
+                AND m.match_id IN ({})
                 AND m.match_region = {}
                 AND m.summoner_id = {}
             GROUP BY
@@ -596,6 +599,7 @@ class Matches(restful.Resource):
             LIMIT {}
             OFFSET {}
         """.format(
+            ','.join([str(match_id) for match_id in match_ids]) if len(match_ids) else "''",
             database.escape(region),
             summoner['id'],
             (end_index - begin_index),
